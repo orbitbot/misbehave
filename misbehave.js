@@ -2,26 +2,42 @@ import m from 'mithril'
 
 let code = {
 
-  oninit : ({ state }) => {
-    window.content = state.content = m.prop('')
-    state.content.map((x) => console.log(x))
-    state.logKeypress = (evt) => {
-      var charCode = evt.which || evt.keyCode;
-      var charTyped = String.fromCharCode(charCode);
-      console.log(charTyped)
-    }
+  oncreate : ({ state, dom }) => {
+    state.observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        var message = "";
+        switch (mutation.type) {
+            case 'characterData':
+                message = "Character data changed from '" + mutation.oldValue +
+                    "' to '" + mutation.target.data + "'";
+                break;
+            case 'attributes':
+                message = "Attribute '" + mutation.attributeName + "' changed from '" + mutation.oldValue +
+                    "' to '" + mutation.target.getAttribute(mutation.attributeName) + "'";
+                break;
+            case 'childList':
+                message = "DOM tree changed inside node with name " + mutation.target.nodeName;
+                break;
+        }
+        console.log(message)
+      })
+    })
+    state.observer.observe(dom, {
+      subtree: true,
+      attributes: true,
+      childList: true,
+      characterData: true,
+      characterDataOldValue: true
+    });
   },
 
-  // oncreate : ({ state, dom }) => {asa
-  //   console.log(dom.querySelector('#editor'))
-  // },
+  onremove : ({ state }) => {
+    state.observer.disconnect()
+  },
 
   view : ({ state }) => {
     return m('code#editor', {
       contenteditable : true,
-      onkeypress : state.logKeypress,
-      oninput : m.withAttr('textContent', state.content),
-      textContent : state.content()
     })
   }
 }
