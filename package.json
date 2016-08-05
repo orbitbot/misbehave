@@ -1,0 +1,24 @@
+{
+  "name": "misbehave",
+  "version": "0.0.1",
+  "description": "Explorations in replecating behave.js in a contenteditable code block",
+  "private": true,
+  "main": "misbehave.js",
+  "scripts": {
+    "start": "rollup --config --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "rollup": "0.34.1",
+    "rollup-plugin-buble": "0.12.1",
+    "rollup-plugin-commonjs": "3.3.1",
+    "rollup-plugin-filesize": "0.4.4",
+    "rollup-plugin-node-resolve": "1.7.1",
+    "rollup-watch": "2.5.0"
+  },
+  "dependencies": {
+    "mithril": "github:lhorie/mithril.js#rewrite"
+  }
+}
