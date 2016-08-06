@@ -1,27 +1,43 @@
 import m from 'mithril'
+import Combokeys from 'combokeys'
+
+const log = (e, combo) => { console.log(combo) }
+const block = (e, combo) => { console.log(combo); return false; }
 
 let code = {
 
   oninit : ({ state }) => {
-    window.content = state.content = m.prop('')
+    state.content = m.prop('')
+    window.content = state.content
     state.content.map((x) => console.log(x))
-    state.logKeypress = (evt) => {
-      var charCode = evt.which || evt.keyCode;
-      var charTyped = String.fromCharCode(charCode);
-      console.log(charTyped)
-    }
   },
 
-  // oncreate : ({ state, dom }) => {asa
-  //   console.log(dom.querySelector('#editor'))
-  // },
+  oncreate : ({ state, dom }) => {
+    state.keys = new Combokeys(dom)
+    state.keys.bind('tab', block)
+    state.keys.bind('shift+tab', block)
+    state.keys.bind('backspace', log)
+    state.keys.bind('del', log)
+    state.keys.bind('enter', log)
+    state.keys.bind('(', () => {
+      state.content(state.content() + '()')
+      dom.textContent = state.content()
+      return false
+    })
+    state.keys.bind('[', log)
+    state.keys.bind('{', log)
+    state.keys.bind("'", log)
+    state.keys.bind('"', log)
+  },
+
+  onremove : ({ state }) => {
+    state.keys.detach()
+  },
 
   view : ({ state }) => {
-    return m('code#editor', {
+    return m('code.combokeys', {
       contenteditable : true,
-      onkeypress : state.logKeypress,
       oninput : m.withAttr('textContent', state.content),
-      textContent : state.content()
     })
   }
 }
