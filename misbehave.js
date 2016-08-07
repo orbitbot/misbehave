@@ -130,6 +130,7 @@ let code = {
 
   view : ({ state }) => {
     return m('code', {
+      class: 'language-javascript',
       contenteditable : true,
       oninput : m.withAttr('textContent', state.updateContent)
     })
