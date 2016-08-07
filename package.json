@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "combokeys": "2.4.6",
-    "mithril": "github:lhorie/mithril.js#rewrite"
+    "mithril": "github:lhorie/mithril.js#rewrite",
+    "undo-manager": "1.0.5"
   }
 }

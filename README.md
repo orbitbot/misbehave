@@ -1,11 +1,14 @@
 # misbehave
 > Explorations in replecating [behave.js](https://github.com/iamso/Behave.js) in a contenteditable code block
 
+<br>
+
 **Experimental, contributions welcome**
 
 Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/mithril.js) rewrite for convenience, but if this approach matures it will probably be refactored to work without that particular dependency.
 
 
+<br>
 
 ### Roadmap / features / ideas
 
@@ -14,6 +17,8 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 - **undo/redo** : probably using https://github.com/ArthurClemens/Javascript-Undo-Manager or similar
   - hijack typical undo/redo key combinations and repopulate content as appropriate
 - **syntax highlighting** : support [http://prismjs.com/](http://prismjs.com/) in `<pre><code contenteditable></code></pre>` blocks
+
+<br>
 
 **behave.js functionality**
 
