@@ -1,11 +1,11 @@
 # misbehave
-> Explorations in replecating [behave.js](https://github.com/iamso/Behave.js) in a contenteditable code block
+> Explorations in replicating [behave.js](https://github.com/iamso/Behave.js) in a contenteditable code block
 
 <br>
 
 **Experimental, contributions welcome**
 
-Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/mithril.js) rewrite for convenience, but if this approach matures it will probably be refactored to work without that particular dependency.
+Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/mithril.js) rewrite for convenience, but if this approach matures it will probably be refactored to be framework agnostic.
 
 
 <br>
@@ -37,3 +37,19 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 - **overwrite** : If you type a closing character directly before an identical character, it will overwrite it instead of adding it. Best used with autoOpen set to true
 - **autoStrip** : If set to true, and your cursor is between two paired characters, pressing backspace will delete both instead of just the first
 - **autoIndent** : If set to true, automatic indentation of your code will be attempted. Best used with autoOpen set to true
+
+<br>
+
+### Basic support
+
+- [x] undo/redo (naive, should probably group and do something about caret placement)
+- [ ] replaceTab
+  - [ ] insert tab instead of cycle focus
+  - [ ] de-indent with shift-tab
+  - [ ] multi-line support
+- [ ] softTabs
+- [ ] tabSize
+- [x] autoOpen (POC, doesn't handle selection afterwards)
+- [ ] overwrite
+- [ ] autoStrip
+- [ ] autoIndent
