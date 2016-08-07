@@ -17,18 +17,33 @@ const getLinePosition = (node) => {
   }
   return text.split(/\r\n|\r|\n/).length - 1
 }
-const insert = (str, line, index, s) => {
-  // console.log(`insert ${ s } at ${ line + ',' + index } of ${ str }`)
-  let lines = str.split(/\r\n|\r|\n/)
-  let lineContent = lines[line]
-  // console.log(lineContent, lines)
-  lines[line] = lineContent.slice(0, index) + s + lineContent.slice(index)
-  // console.log('lines[line]', lines[line])
-  return lines.join('\n')
-}
 const withSelection = (fn) => () => {
   let sel = window.getSelection()
   return fn(sel, sel.getRangeAt(0), getLinePosition(sel.anchorNode), sel.anchorOffset, getLinePosition(sel.focusNode), sel.focusOffset)
+}
+const withStartEnd = (fn) => {
+  return withSelection((selection, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
+    console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
+    let startLine, startOffset, endLine, endOffset, sameLine
+    if (anchorLine == focusLine) {
+      startLine = anchorLine
+      startOffset = Math.min(anchorOffset, focusOffset)
+      endLine = anchorLine
+      endOffset = Math.max(anchorOffset, focusOffset)
+      sameLine = true
+    } else if (anchorLine < focusLine) {
+      startLine = anchorLine
+      startOffset = anchorOffset
+      endLine = focusLine
+      endOffset = focusOffset
+    } else {
+      startLine = focusLine
+      startOffset = focusOffset
+      endLine = anchorLine
+      endOffset = anchorOffset
+    }
+    return fn(selection, range, startLine, startOffset, endLine, endOffset, sameLine)
+  })
 }
 const nthOccurrance = (string, character, n) => {
   // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
@@ -62,12 +77,32 @@ let code = {
     state.keys = new Combokeys(dom)
     state.keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
-    state.keys.bind('tab', withSelection((select, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
-      window.code = dom
-      window.select = select
-      window.range = range
+    const extractSections = (fn) => {
+      return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset, sameLine) => {
+        let prefixIndex = nthOccurrance(dom.textContent, '\n', startLine) + startOffset
+        let prefix = dom.textContent.slice(0, prefixIndex)
+        let content = range.toString()
+        let suffix = dom.textContent.slice(prefixIndex + content.length)
 
-      console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
+        console.info('prefix', prefix)
+        console.info('content', content)
+        console.info('suffix', suffix)
+
+        return fn(selection, range, prefix, content, suffix)
+      })
+    }
+
+    state.keys.bind('tab', extractSections((selection, range, prefix, content, suffix) => {
+
+      let update = prefix + '\t' + content + suffix
+      state.updateContent(update)
+      dom.textContent = state.content()
+
+      let newRange = document.createRange()
+      newRange.setStart(dom.childNodes[0], prefix.length + 1)
+      newRange.setEnd(dom.childNodes[0], prefix.length + 1 + content.length)
+      selection.removeAllRanges()
+      selection.addRange(newRange)
 
       return false
     }))
@@ -79,37 +114,17 @@ let code = {
     state.keys.bind('shift+mod+z', () => { undoMgr.redo(); return false })
 
     const autoOpen = (openChar, closeChar) => {
-      return withSelection((select, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
-        let startLine, startOffset, endLine, endOffset, sameLine
-        if (anchorLine == focusLine) {
-          startLine = anchorLine
-          startOffset = Math.min(anchorOffset, focusOffset)
-          endLine = anchorLine
-          endOffset = Math.max(anchorOffset, focusOffset)
-          sameLine = true
-        } else if (anchorLine < focusLine) {
-          startLine = anchorLine
-          startOffset = anchorOffset
-          endLine = focusLine
-          endOffset = focusOffset
-        } else {
-          startLine = focusLine
-          startOffset = focusOffset
-          endLine = anchorLine
-          endOffset = anchorOffset
-        }
+      return extractSections((selection, range, prefix, content, suffix) => {
 
-        let update = insert(state.content(), startLine, startOffset, openChar)
-        update = insert(update, endLine, sameLine ? endOffset + 1 : endOffset , closeChar)
+        let update = prefix + openChar + content + closeChar + suffix
         state.updateContent(update)
         dom.textContent = state.content()
 
         let newRange = document.createRange()
-        newRange.setStart(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', startLine) + startOffset + 1)
-        let endSelOffset = sameLine ? 1 : 0
-        newRange.setEnd(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', endLine) + endOffset + endSelOffset)
-        select.removeAllRanges()
-        select.addRange(newRange)
+        newRange.setStart(dom.childNodes[0], prefix.length + 1)
+        newRange.setEnd(dom.childNodes[0], prefix.length + 1 + content.length)
+        selection.removeAllRanges()
+        selection.addRange(newRange)
 
         return false
       })

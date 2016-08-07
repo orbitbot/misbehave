@@ -40,12 +40,12 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 
 <br>
 
-### Basic support
+### Basic support for
 
-- [x] undo/redo (naive, should probably group and do something about caret placement)
+- [x] undo/redo (naive, should probably group and do something about caret placement / selection)
 - [ ] replaceTab
-  - [ ] insert tab instead of cycle focus
-  - [ ] de-indent with shift-tab
+  - [x] insert tab instead of cycle focus
+  - [ ] de-indent with shift-tab (subl does tab indent if no range selected)
   - [ ] multi-line support
 - [ ] softTabs
 - [ ] tabSize
