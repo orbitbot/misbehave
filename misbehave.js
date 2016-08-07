@@ -30,14 +30,14 @@ const withSelection = (fn) => () => {
   let sel = window.getSelection()
   return fn(sel, sel.getRangeAt(0), getLinePosition(sel.anchorNode), sel.anchorOffset, getLinePosition(sel.focusNode), sel.focusOffset)
 }
-const setSelection = (elem, start, end) => {
-  let range = document.createRange()
-  range.setStart(elem, start)
-  range.setEnd(elem, end)
-
-  let selection = window.getSelection()
-  selection.removeAllRanges()
-  selection.addRange(range)
+const nthOccurrance = (string, character, n) => {
+  // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
+  var count = 0, i = 0;
+  while (count < n && (i = string.indexOf(character, i) + 1)) {
+    count++;
+  }
+  if (count == n) return i;
+  return NaN;
 }
 
 let code = {
@@ -63,6 +63,7 @@ let code = {
     state.keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
     state.keys.bind('tab', withSelection((select, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
+      window.code = dom
       window.select = select
       window.range = range
 
@@ -101,6 +102,13 @@ let code = {
       update = insert(update, endLine, sameLine ? endOffset + 1 : endOffset , ')')
       state.updateContent(update)
       dom.textContent = state.content()
+
+      let newRange = document.createRange()
+      newRange.setStart(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', startLine) + startOffset + 1)
+      let endSelOffset = sameLine ? 1 : 0
+      newRange.setEnd(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', endLine) + endOffset + endSelOffset)
+      select.removeAllRanges()
+      select.addRange(newRange)
 
       return false
     }))
