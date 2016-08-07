@@ -24,25 +24,14 @@ const withSelection = (fn) => () => {
 const withStartEnd = (fn) => {
   return withSelection((selection, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
     console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
-    let startLine, startOffset, endLine, endOffset, sameLine
+    // calls fn with selection, range, startLine, startOffset, endLine, endOffset
     if (anchorLine == focusLine) {
-      startLine = anchorLine
-      startOffset = Math.min(anchorOffset, focusOffset)
-      endLine = anchorLine
-      endOffset = Math.max(anchorOffset, focusOffset)
-      sameLine = true
+      return fn(selection, range, anchorLine, Math.min(anchorOffset, focusOffset), anchorLine, Math.max(anchorOffset, focusOffset))
     } else if (anchorLine < focusLine) {
-      startLine = anchorLine
-      startOffset = anchorOffset
-      endLine = focusLine
-      endOffset = focusOffset
+      return fn(selection, range, anchorLine, anchorOffset, focusLine, focusOffset)
     } else {
-      startLine = focusLine
-      startOffset = focusOffset
-      endLine = anchorLine
-      endOffset = anchorOffset
+      return fn(selection, range, focusLine, focusOffset, anchorLine, anchorOffset)
     }
-    return fn(selection, range, startLine, startOffset, endLine, endOffset, sameLine)
   })
 }
 const nthOccurrance = (string, character, n) => {
@@ -78,15 +67,13 @@ let code = {
     state.keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
     const extractSections = (fn) => {
-      return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset, sameLine) => {
+      return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
         let prefixIndex = nthOccurrance(dom.textContent, '\n', startLine) + startOffset
         let prefix = dom.textContent.slice(0, prefixIndex)
         let content = range.toString()
         let suffix = dom.textContent.slice(prefixIndex + content.length)
 
-        console.info('prefix', prefix)
-        console.info('content', content)
-        console.info('suffix', suffix)
+        console.info('extracted', [prefix, content, suffix])
 
         return fn(selection, range, prefix, content, suffix)
       })
