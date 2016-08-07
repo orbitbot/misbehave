@@ -49,7 +49,7 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
   - [ ] multi-line support
 - [ ] softTabs
 - [ ] tabSize
-- [x] autoOpen (POC, doesn't handle selection afterwards)
+- [x] autoOpen (minor bug with multiline selection if multiple are added in sequence)
 - [ ] overwrite
 - [ ] autoStrip
 - [ ] autoIndent

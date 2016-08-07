@@ -78,44 +78,48 @@ let code = {
     state.keys.bind('mod+z', () => { undoMgr.undo(); return false })
     state.keys.bind('shift+mod+z', () => { undoMgr.redo(); return false })
 
-    state.keys.bind('(', withSelection((select, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
-      let startLine, startOffset, endLine, endOffset, sameLine
-      if (anchorLine == focusLine) {
-        startLine = anchorLine
-        startOffset = Math.min(anchorOffset, focusOffset)
-        endLine = anchorLine
-        endOffset = Math.max(anchorOffset, focusOffset)
-        sameLine = true
-      } else if (anchorLine < focusLine) {
-        startLine = anchorLine
-        startOffset = anchorOffset
-        endLine = focusLine
-        endOffset = focusOffset
-      } else {
-        startLine = focusLine
-        startOffset = focusOffset
-        endLine = anchorLine
-        endOffset = anchorOffset
-      }
+    const autoOpen = (openChar, closeChar) => {
+      return withSelection((select, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
+        let startLine, startOffset, endLine, endOffset, sameLine
+        if (anchorLine == focusLine) {
+          startLine = anchorLine
+          startOffset = Math.min(anchorOffset, focusOffset)
+          endLine = anchorLine
+          endOffset = Math.max(anchorOffset, focusOffset)
+          sameLine = true
+        } else if (anchorLine < focusLine) {
+          startLine = anchorLine
+          startOffset = anchorOffset
+          endLine = focusLine
+          endOffset = focusOffset
+        } else {
+          startLine = focusLine
+          startOffset = focusOffset
+          endLine = anchorLine
+          endOffset = anchorOffset
+        }
 
-      let update = insert(state.content(), startLine, startOffset, '(')
-      update = insert(update, endLine, sameLine ? endOffset + 1 : endOffset , ')')
-      state.updateContent(update)
-      dom.textContent = state.content()
+        let update = insert(state.content(), startLine, startOffset, openChar)
+        update = insert(update, endLine, sameLine ? endOffset + 1 : endOffset , closeChar)
+        state.updateContent(update)
+        dom.textContent = state.content()
 
-      let newRange = document.createRange()
-      newRange.setStart(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', startLine) + startOffset + 1)
-      let endSelOffset = sameLine ? 1 : 0
-      newRange.setEnd(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', endLine) + endOffset + endSelOffset)
-      select.removeAllRanges()
-      select.addRange(newRange)
+        let newRange = document.createRange()
+        newRange.setStart(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', startLine) + startOffset + 1)
+        let endSelOffset = sameLine ? 1 : 0
+        newRange.setEnd(dom.childNodes[0], nthOccurrance(dom.textContent, '\n', endLine) + endOffset + endSelOffset)
+        select.removeAllRanges()
+        select.addRange(newRange)
 
-      return false
-    }))
-    state.keys.bind('[', log)
-    state.keys.bind('{', log)
-    state.keys.bind("'", log)
-    state.keys.bind('"', log)
+        return false
+      })
+    }
+
+    state.keys.bind('(', autoOpen('(', ')'))
+    state.keys.bind('[', autoOpen('[', ']'))
+    state.keys.bind('{', autoOpen('{', '}'))
+    state.keys.bind("'", autoOpen("'", "'"))
+    state.keys.bind('"', autoOpen('"', '"'))
   },
 
   onremove : ({ state }) => {
