@@ -52,4 +52,4 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 - [x] autoOpen
 - [x] overwrite
 - [x] autoStrip
-- [ ] autoIndent
+- [x] autoIndent (doesn't consider tabs/softtabs correctly)
