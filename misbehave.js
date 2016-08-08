@@ -104,11 +104,30 @@ let code = {
 
     state.keys.bind('tab', state.extractSections((selection, range, prefix, selected, suffix) => {
       prefix += '\t'
+      selected = selected.replace(/\n/g, '\n\t')
       state.updateContent({ prefix, selected, suffix }, true)
 
       return false
     }))
-    state.keys.bind('shift+tab', block)
+    state.keys.bind('shift+tab', state.extractSections((selection, range, prefix, selected, suffix) => {
+      let lines = selected.split('\n')
+      if (lines.length === 1) {
+        if (prefix.slice(-1) === '\t')
+          prefix = prefix.slice(0, -1)
+        else
+          prefix += '\t' // indent forward
+      } else {
+        if (prefix.slice(-1) === '\t')
+          prefix = prefix.slice(0, -1)
+        lines = lines.map((line) => {
+          return line.replace(/^\t/, '')
+        })
+        selected = lines.join('\n')
+      }
+      state.updateContent({ prefix, selected, suffix }, true)
+
+      return false
+    }))
     state.keys.bind('backspace', state.extractSections((selection, range, prefix, selected, suffix) => {
       let preEnd = prefix.slice(-1)
       let sufStart = suffix.charAt(0)

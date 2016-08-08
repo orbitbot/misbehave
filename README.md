@@ -43,10 +43,10 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 ### Basic support for
 
 - [x] undo/redo (naive, each input is new action and doesn't handle restoring selection perfectly)
-- [ ] replaceTab
+- [x] replaceTab
   - [x] insert tab instead of cycle focus
-  - [ ] de-indent with shift-tab (subl does tab indent if no range selected)
-  - [ ] multi-line support
+  - [x] de-indent with shift-tab (subl does tab indent if no range selected)
+  - [x] multi-line support
 - [ ] softTabs
 - [ ] tabSize
 - [x] autoOpen
