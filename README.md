@@ -42,14 +42,14 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 
 ### Basic support for
 
-- [x] undo/redo (naive, should probably group and do something about caret placement / selection)
+- [x] undo/redo (naive, each input is new action and doesn't handle restoring selection perfectly)
 - [ ] replaceTab
   - [x] insert tab instead of cycle focus
   - [ ] de-indent with shift-tab (subl does tab indent if no range selected)
   - [ ] multi-line support
 - [ ] softTabs
 - [ ] tabSize
-- [x] autoOpen (minor bug with multiline selection if multiple are added in sequence)
+- [x] autoOpen
 - [ ] overwrite
 - [ ] autoStrip
 - [ ] autoIndent

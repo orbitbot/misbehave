@@ -24,7 +24,7 @@ const withSelection = (fn) => () => {
 const withStartEnd = (fn) => {
   return withSelection((selection, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
     console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
-    // calls fn with selection, range, startLine, startOffset, endLine, endOffset
+    // calls fn with (selection, range, startLine, startOffset, endLine, endOffset)
     if (anchorLine == focusLine) {
       return fn(selection, range, anchorLine, Math.min(anchorOffset, focusOffset), anchorLine, Math.max(anchorOffset, focusOffset))
     } else if (anchorLine < focusLine) {
@@ -47,11 +47,18 @@ const nthOccurrance = (string, character, n) => {
 let code = {
 
   oninit : ({ state }) => {
-    state.content = m.prop('')
+    state.content = m.prop({ prefix: '', selected: '', suffix: '' })
     window.content = state.content
     state.content.map((x) => console.log(x))
 
-    state.setSelection = (node, prefixLen, rngLen) => {
+    state.setSelection = (elem, prefixLen, rngLen) => {
+      let node
+      if (elem.childNodes[0]) {
+        node = elem.childNodes[0]
+      } else {
+        node = elem
+        prefixLen, rngLen = 0
+      }
       let selection = document.getSelection()
       let range = document.createRange()
       range.setStart(node, prefixLen)
@@ -63,10 +70,30 @@ let code = {
     state.updateContent = (update) => {
       let previous = state.content()
       undoMgr.add({
-        undo : () => { state.dom.textContent = previous },
-        redo : () => { state.dom.textContent = update }
+        undo : () => {
+          // console.log('undo w/', previous)
+          state.dom.textContent = previous.prefix + previous.selected + previous.suffix
+          state.setSelection(state.dom, previous.prefix.length, previous.selected.length)
+        },
+        redo : () => {
+          // console.log('redo w/', update)
+          state.dom.textContent = update.prefix + update.selected + update.suffix
+          state.setSelection(state.dom, update.prefix.length, update.selected.length)
+        }
       })
       state.content(update)
+    }
+    state.extractSections = (fn) => {
+      return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
+        let prefixIndex = nthOccurrance(state.dom.textContent, '\n', startLine) + startOffset
+        let prefix = state.dom.textContent.slice(0, prefixIndex)
+        let selected = range.toString()
+        let suffix = state.dom.textContent.slice(prefixIndex + selected.length)
+
+        console.info('extracted', [prefix, selected, suffix])
+
+        return fn(selection, range, prefix, selected, suffix)
+      })
     }
   },
 
@@ -75,26 +102,13 @@ let code = {
     state.keys = new Combokeys(dom)
     state.keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
-    const extractSections = (fn) => {
-      return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
-        let prefixIndex = nthOccurrance(dom.textContent, '\n', startLine) + startOffset
-        let prefix = dom.textContent.slice(0, prefixIndex)
-        let content = range.toString()
-        let suffix = dom.textContent.slice(prefixIndex + content.length)
+    state.keys.bind('tab', state.extractSections((selection, range, prefix, selected, suffix) => {
 
-        console.info('extracted', [prefix, content, suffix])
+      prefix += '\t'
+      state.updateContent({ prefix, selected, suffix })
 
-        return fn(selection, range, prefix, content, suffix)
-      })
-    }
-
-    state.keys.bind('tab', extractSections((selection, range, prefix, content, suffix) => {
-
-      let update = prefix + '\t' + content + suffix
-      state.updateContent(update)
-      dom.textContent = state.content()
-
-      state.setSelection(dom.childNodes[0], prefix.length + 1 , content.length)
+      dom.textContent = prefix + selected + suffix
+      state.setSelection(dom, prefix.length, selected.length)
 
       return false
     }))
@@ -106,13 +120,14 @@ let code = {
     state.keys.bind('shift+mod+z', () => { undoMgr.redo(); return false })
 
     const autoOpen = (openChar, closeChar) => {
-      return extractSections((selection, range, prefix, content, suffix) => {
+      return state.extractSections((selection, range, prefix, selected, suffix) => {
 
-        let update = prefix + openChar + content + closeChar + suffix
-        state.updateContent(update)
-        dom.textContent = state.content()
+        prefix += openChar
+        suffix = closeChar + suffix
+        state.updateContent({ prefix, selected, suffix })
 
-        state.setSelection(dom.childNodes[0], prefix.length + 1 , content.length)
+        dom.textContent = prefix + selected + suffix
+        state.setSelection(dom, prefix.length, selected.length)
 
         return false
       })
@@ -129,10 +144,12 @@ let code = {
     state.keys.detach()
   },
 
-  view : ({ state }) => {
+  view : ({ state, dom }) => {
     return m('code', {
       contenteditable : true,
-      oninput : m.withAttr('textContent', state.updateContent)
+      oninput : state.extractSections((selection, range, prefix, selected, suffix) => {
+        state.updateContent({ prefix, selected, suffix })
+      })
     })
   }
 }
