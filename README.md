@@ -51,5 +51,5 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 - [ ] tabSize
 - [x] autoOpen
 - [ ] overwrite
-- [ ] autoStrip
+- [x] autoStrip
 - [ ] autoIndent

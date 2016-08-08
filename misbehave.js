@@ -73,14 +73,15 @@ let code = {
     }
 
     state.updateContent = (update, updateDom) => {
+      // this should probably track document selectionchange w/ activeElemet to have undo/redo block selections work,
+      // eg selection on should be whatever it was before keydown when going backwards (messes up forward history navigation?)
       let previous = state.content()
       undoMgr.add({
         undo : () => { state.setDom(previous) },
         redo : () => { state.setDom(update) }
       })
       state.content(update)
-      if (updateDom)
-        state.setDom(update)
+      if (updateDom) state.setDom(update)
     }
     state.extractSections = (fn) => {
       return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
@@ -108,7 +109,21 @@ let code = {
       return false
     }))
     state.keys.bind('shift+tab', block)
-    state.keys.bind('backspace', log)
+    state.keys.bind('backspace', state.extractSections((selection, range, prefix, selected, suffix) => {
+      let preEnd = prefix.slice(-1)
+      let sufStart = suffix.charAt(0)
+      if (selection.isCollapsed &&
+          (preEnd === '(' && sufStart === ')') ||
+          (preEnd === '{' && sufStart === '}') ||
+          (preEnd === '[' && sufStart === ']') ||
+          (preEnd === '"' && sufStart === '"') ||
+          (preEnd === "'" && sufStart === "'")) {
+        prefix = prefix.slice(0, -1)
+        suffix = suffix.slice(1)
+        state.updateContent({ prefix, selected, suffix }, true)
+        return false
+      }
+    }))
     state.keys.bind('enter', log)
 
     state.keys.bind('mod+z', () => { undoMgr.undo(); return false })
