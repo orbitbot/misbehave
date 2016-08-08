@@ -144,6 +144,23 @@ let code = {
     state.keys.bind('{', autoOpen('{', '}'))
     state.keys.bind("'", autoOpen("'", "'"))
     state.keys.bind('"', autoOpen('"', '"'))
+
+    const overwrite = (closeChar) => {
+      return state.extractSections((selection, range, prefix, selected, suffix) => {
+        if (selection.isCollapsed && suffix.charAt(0) === closeChar) {
+          prefix += closeChar
+          suffix = suffix.slice(1)
+          state.updateContent({ prefix, selected, suffix }, true)
+          return false
+        }
+      })
+    }
+
+    state.keys.bind(')', overwrite(')'))
+    state.keys.bind(']', overwrite(']'))
+    state.keys.bind('}', overwrite('}'))
+    state.keys.bind("'", overwrite("'"))
+    state.keys.bind('"', overwrite('"'))
   },
 
   onremove : ({ state }) => {

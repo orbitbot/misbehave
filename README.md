@@ -50,6 +50,6 @@ Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/
 - [ ] softTabs
 - [ ] tabSize
 - [x] autoOpen
-- [ ] overwrite
+- [x] overwrite
 - [x] autoStrip
 - [ ] autoIndent
