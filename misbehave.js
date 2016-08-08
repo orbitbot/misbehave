@@ -67,21 +67,20 @@ let code = {
       selection.addRange(range)
     }
 
-    state.updateContent = (update) => {
+    state.setDom = (value) => {
+      state.dom.textContent = value.prefix + value.selected + value.suffix
+      state.setSelection(state.dom, value.prefix.length, value.selected.length)
+    }
+
+    state.updateContent = (update, updateDom) => {
       let previous = state.content()
       undoMgr.add({
-        undo : () => {
-          // console.log('undo w/', previous)
-          state.dom.textContent = previous.prefix + previous.selected + previous.suffix
-          state.setSelection(state.dom, previous.prefix.length, previous.selected.length)
-        },
-        redo : () => {
-          // console.log('redo w/', update)
-          state.dom.textContent = update.prefix + update.selected + update.suffix
-          state.setSelection(state.dom, update.prefix.length, update.selected.length)
-        }
+        undo : () => { state.setDom(previous) },
+        redo : () => { state.setDom(update) }
       })
       state.content(update)
+      if (updateDom)
+        state.setDom(update)
     }
     state.extractSections = (fn) => {
       return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
@@ -103,12 +102,8 @@ let code = {
     state.keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
     state.keys.bind('tab', state.extractSections((selection, range, prefix, selected, suffix) => {
-
       prefix += '\t'
-      state.updateContent({ prefix, selected, suffix })
-
-      dom.textContent = prefix + selected + suffix
-      state.setSelection(dom, prefix.length, selected.length)
+      state.updateContent({ prefix, selected, suffix }, true)
 
       return false
     }))
@@ -121,13 +116,9 @@ let code = {
 
     const autoOpen = (openChar, closeChar) => {
       return state.extractSections((selection, range, prefix, selected, suffix) => {
-
         prefix += openChar
         suffix = closeChar + suffix
-        state.updateContent({ prefix, selected, suffix })
-
-        dom.textContent = prefix + selected + suffix
-        state.setSelection(dom, prefix.length, selected.length)
+        state.updateContent({ prefix, selected, suffix }, true)
 
         return false
       })
