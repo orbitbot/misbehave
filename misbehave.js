@@ -139,12 +139,6 @@ let code = {
       })
     }
 
-    state.keys.bind('(', autoOpen('(', ')'))
-    state.keys.bind('[', autoOpen('[', ']'))
-    state.keys.bind('{', autoOpen('{', '}'))
-    state.keys.bind("'", autoOpen("'", "'"))
-    state.keys.bind('"', autoOpen('"', '"'))
-
     const overwrite = (closeChar) => {
       return state.extractSections((selection, range, prefix, selected, suffix) => {
         if (selection.isCollapsed && suffix.charAt(0) === closeChar) {
@@ -156,11 +150,11 @@ let code = {
       })
     }
 
-    state.keys.bind(')', overwrite(')'))
-    state.keys.bind(']', overwrite(']'))
-    state.keys.bind('}', overwrite('}'))
-    state.keys.bind("'", overwrite("'"))
-    state.keys.bind('"', overwrite('"'))
+    const pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"', '"'], ['"', '"']]
+    pairs.forEach(([opening, closing]) => {
+      state.keys.bind(opening, autoOpen(opening, closing))
+      state.keys.bind(closing, overwrite(closing))
+    })
   },
 
   onremove : ({ state }) => {
