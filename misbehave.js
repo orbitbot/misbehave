@@ -51,6 +51,15 @@ let code = {
     window.content = state.content
     state.content.map((x) => console.log(x))
 
+    state.setSelection = (node, prefixLen, rngLen) => {
+      let selection = document.getSelection()
+      let range = document.createRange()
+      range.setStart(node, prefixLen)
+      range.setEnd(node, prefixLen + rngLen)
+      selection.removeAllRanges()
+      selection.addRange(range)
+    }
+
     state.updateContent = (update) => {
       let previous = state.content()
       undoMgr.add({
@@ -85,11 +94,7 @@ let code = {
       state.updateContent(update)
       dom.textContent = state.content()
 
-      let newRange = document.createRange()
-      newRange.setStart(dom.childNodes[0], prefix.length + 1)
-      newRange.setEnd(dom.childNodes[0], prefix.length + 1 + content.length)
-      selection.removeAllRanges()
-      selection.addRange(newRange)
+      state.setSelection(dom.childNodes[0], prefix.length + 1 , content.length)
 
       return false
     }))
@@ -107,11 +112,7 @@ let code = {
         state.updateContent(update)
         dom.textContent = state.content()
 
-        let newRange = document.createRange()
-        newRange.setStart(dom.childNodes[0], prefix.length + 1)
-        newRange.setEnd(dom.childNodes[0], prefix.length + 1 + content.length)
-        selection.removeAllRanges()
-        selection.addRange(newRange)
+        state.setSelection(dom.childNodes[0], prefix.length + 1 , content.length)
 
         return false
       })
