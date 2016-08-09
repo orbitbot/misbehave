@@ -4,10 +4,11 @@ import buble       from 'rollup-plugin-buble';
 import filesize    from 'rollup-plugin-filesize';
 
 module.exports = {
-  entry   : 'misbehave.js',
-  dest    : 'build.js',
-  format  : 'iife',
-  plugins : [
+  entry      : 'index.js',
+  dest       : 'misbehave.js',
+  format     : 'iife',
+  moduleName : 'Misbehave',
+  plugins    : [
     nodeResolve({ jsnext: true, main: true, browser: true }),
     commonjs(),
     buble(),
