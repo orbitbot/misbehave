@@ -1,54 +1,45 @@
 # misbehave
-> Explorations in replicating [behave.js](https://github.com/iamso/Behave.js) in a contenteditable code block
+> Add IDE-like text entry to HTML contenteditable tags
+
+`misbehave` is a small library for adding IDE-like text entry to HTML `contenteditable` tags, inspired by [behave.js](https://github.com/iamso/Behave.js). When you need something, but [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) seem large (they're probably more robust, so pick your poison).
+
+`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the README]() for details.
+
+- [Live demo on GH pages]()
+- [Live demo with javascript syntax highlighting]() using [Prism.js](http://prismjs.com/)
 
 <br>
 
-**Experimental, contributions welcome**
+**Experimental**
 
-Misbehave has not yet gone through robust testing, so buyer beware.
-
-<br>
-
-### Roadmap / features / ideas
-
-- **project size** : keep as small as possible, keeping below functionality in mind
-  - avoid behemoth dependencies like [Rangy](https://github.com/timdown/rangy), for more advanced purposes the [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) already exist
-- **undo/redo** : probably using https://github.com/ArthurClemens/Javascript-Undo-Manager or similar
-  - hijack typical undo/redo key combinations and repopulate content as appropriate
-- **syntax highlighting** : support [http://prismjs.com/](http://prismjs.com/) in `<pre><code contenteditable></code></pre>` blocks
+Misbehave has not yet gone through robust testing, so buyer beware. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
 
 <br>
 
-**behave.js functionality**
+### Features
 
-- **replaceTab**
-  - Pressing the tab key will insert a tab instead of cycle input focus.
-  - If you are holding shift, and there is a full tab before your cursor (whatever your tab may be), it will unindent.
-  - If you have a range selected, both of the above rules will apply to all lines selected (multi-line indent/unindent)
-- **softTabs** : If set to true, spaces will be used instead of a tab character
-- **tabSize** : If softTabs is set to true, the number of spaces used is defined here. If set to false, the CSS property tab-size will be used to define hard tab sizes.
-- **autoOpen** : If any of the following characters are typed, their counterparts are automatically added:
-  - `(` adds `()`
-  - `{` adds `{}`
-  - `[` adds `[]`
-  - `"` adds `""`
-  - `'` adds `''`
-- **overwrite** : If you type a closing character directly before an identical character, it will overwrite it instead of adding it. Best used with autoOpen set to true
-- **autoStrip** : If set to true, and your cursor is between two paired characters, pressing backspace will delete both instead of just the first
-- **autoIndent** : If set to true, automatic indentation of your code will be attempted. Best used with autoOpen set to true
+| feature    | description                                                                                        | misbehave             | behave.js                              |
+|:-----------|:---------------------------------------------------------------------------------------------------|:---------------------:|:--------------------------------------:|
+| undo/redo  | common keyboard combinations for undo and redo                                                     | custom implementation | uses browser functionality, has issues |
+| autoIndent | indent to previous line start by default, `()` and `{}` has special functionality                  | `Y`                   | `Y`                                    |
+| autoOpen   | if any of `({['"` are typed, their counterparts will also be added                                 | `Y`                   | `Y`                                    |
+| autoStrip  | if your cursor is between two paired characters, backspace will delete both                        | `Y`                   | `Y`                                    |
+| overwrite  | if you type a closing character directly before an identical one, it will overwrite instead of add | `Y`                   | `Y`                                    |
+| replaceTab | tab key indents instead of cycles focus, shift de-indents, similarly for multiline selections      | `Y`                   | `Y`                                    |
+| softTabs   | use spaces instead of tab characters                                                               |                       | `Y`                                    |
+
+- `misbehave`'s undo/redo is a naive implementation where each input is individually undoable and doesn't handle restoring selection perfectly
+- `misbehave`'s autoIndent doesn't yet work correct with regard to tabs / soft tabs
+- `misbehave` is going to support soft tabs and custom tab width
 
 <br>
 
-### Basic support for
+<!-- installation -->
+<!-- Usage -->
+<!-- Usage with Prism.js -->
 
-- [x] undo/redo (naive, each input is new action and doesn't handle restoring selection perfectly)
-- [x] replaceTab
-  - [x] insert tab instead of cycle focus
-  - [x] de-indent with shift-tab
-  - [x] multi-line support
-- [ ] softTabs
-- [ ] tabSize
-- [x] autoOpen
-- [x] overwrite
-- [x] autoStrip
-- [x] autoIndent (doesn't consider tabs/softtabs correctly)
+<br>
+
+### License
+
+`misbehave` is MIT licensed.
