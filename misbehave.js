@@ -1,11 +1,10 @@
 import m from 'mithril'
 import Combokeys from 'combokeys'
 import UndoManager from 'undo-manager'
+import StrUtil from './utils/string'
 
 let undoMgr = new UndoManager()
-
-const log = (e, combo) => { console.log(combo) }
-const block = (e, combo) => { console.log(combo); return false; }
+let strUtil = new StrUtil('\n', '\t')
 
 
 const getLinePosition = (node) => {
@@ -103,67 +102,24 @@ let code = {
     state.keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
     state.keys.bind('tab', state.extractSections((selection, range, prefix, selected, suffix) => {
-      prefix += '\t'
-      selected = selected.replace(/\n/g, '\n\t')
-      state.updateContent({ prefix, selected, suffix }, true)
-
+      state.updateContent(strUtil.tabIndent(prefix, selected, suffix), true)
       return false
     }))
+
     state.keys.bind('shift+tab', state.extractSections((selection, range, prefix, selected, suffix) => {
-      let lines = selected.split('\n')
-      if (lines.length === 1) {
-        if (prefix.slice(-1) === '\t')
-          prefix = prefix.slice(0, -1)
-        else
-          prefix += '\t' // indent forward
-      } else {
-        if (prefix.slice(-1) === '\t')
-          prefix = prefix.slice(0, -1)
-        lines = lines.map((line) => {
-          return line.replace(/^\t/, '')
-        })
-        selected = lines.join('\n')
-      }
-      state.updateContent({ prefix, selected, suffix }, true)
-
+      state.updateContent(strUtil.tabUnindent(prefix, selected, suffix), true)
       return false
     }))
+
     state.keys.bind('backspace', state.extractSections((selection, range, prefix, selected, suffix) => {
-      let prefEnd = prefix.slice(-1)
-      let suffStart = suffix.charAt(0)
-      if (selection.isCollapsed &&
-          (prefEnd === '(' && suffStart === ')') ||
-          (prefEnd === '{' && suffStart === '}') ||
-          (prefEnd === '[' && suffStart === ']') ||
-          (prefEnd === '"' && suffStart === '"') ||
-          (prefEnd === "'" && suffStart === "'")) {
-        prefix = prefix.slice(0, -1)
-        suffix = suffix.slice(1)
-        state.updateContent({ prefix, selected, suffix }, true)
+      if (selection.isCollapsed && strUtils.testAutoStrip(prefix, selected, suffix)) {
+        state.updateContent(strUtils.autoStrip(prefix, selected, suffix), true)
         return false
       }
     }))
+
     state.keys.bind('enter', state.extractSections((selection, range, prefix, selected, suffix) => {
-      // if surrounding parenthesis, indent to current depth
-      // if opening curly brace, indent to current + tab
-      // ++ if closing curly, put on own newline, indent to current
-      //
-      // otherwise indent to leading whitespace
-      let prevLine = prefix.split('\n').splice(-1)[0]
-      console.log('prevLine', JSON.stringify(prevLine))
-      let prefEnd = prefix.slice(-1)
-      let suffStart = suffix.charAt(0)
-      if (prefEnd === '(' && suffStart === ')') {
-        prefix += '\n' + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
-      } else if (prefEnd === '{') {
-        prefix += '\n' + prevLine.match(/^\s*/)[0] + '\t'
-        if (suffStart === '}')
-          suffix = '\n' + prevLine.match(/^\s*/)[0] + suffix
-      } else {
-        prefix += '\n' + prevLine.match(/^\s*/)[0]
-      }
-      selected = ''
-      state.updateContent({ prefix, selected, suffix }, true)
+      state.updateContent(strUtil.autoIndent(prefix, selected, suffix), true)
       return false
     }))
 
@@ -172,20 +128,15 @@ let code = {
 
     const autoOpen = (openChar, closeChar) => {
       return state.extractSections((selection, range, prefix, selected, suffix) => {
-        prefix += openChar
-        suffix = closeChar + suffix
-        state.updateContent({ prefix, selected, suffix }, true)
-
+        state.updateContent(strUtil.autoOpen(openChar, closeChar, prefix, selected, suffix), true)
         return false
       })
     }
 
     const overwrite = (closeChar) => {
       return state.extractSections((selection, range, prefix, selected, suffix) => {
-        if (selection.isCollapsed && suffix.charAt(0) === closeChar) {
-          prefix += closeChar
-          suffix = suffix.slice(1)
-          state.updateContent({ prefix, selected, suffix }, true)
+        if (selection.isCollapsed && strUtil.testOverwrite(closeChar, prefix, selected, suffix)) {
+          state.updateContent(strUtil.overwrite(prefix, selected, suffix), true)
           return false
         }
       })
