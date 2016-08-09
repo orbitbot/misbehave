@@ -1657,7 +1657,7 @@ var require$$0 = Object.freeze({
 	}
 
 	var testOverwrite = function (closing, prefix, selected, suffix) {
-	  return suffix.charAt(0) === closeChar
+	  return suffix.charAt(0) === closing
 	}
 
 	var tabIndent = function (newLine, tab, prefix, selected, suffix) {

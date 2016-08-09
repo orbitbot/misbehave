@@ -55,7 +55,7 @@ export let overwrite = (closing, prefix, selected, suffix) => {
 }
 
 export let testOverwrite = (closing, prefix, selected, suffix) => {
-  return suffix.charAt(0) === closeChar
+  return suffix.charAt(0) === closing
 }
 
 export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
