@@ -5,8 +5,7 @@
 
 **Experimental, contributions welcome**
 
-Currently, this is implemented using the [Mithril.js](https://github.com/lhorie/mithril.js) rewrite for convenience, but if this approach matures it will probably be refactored to be framework agnostic.
-
+Misbehave has not yet gone through robust testing, so buyer beware.
 
 <br>
 
