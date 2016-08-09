@@ -3,10 +3,10 @@
 
 `misbehave` is a small library for adding IDE-like text entry to HTML `contenteditable` tags, inspired by [behave.js](https://github.com/iamso/Behave.js). When you need something, but [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) seem large (they're probably more robust, so pick your poison).
 
-`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the README]() for details.
+`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the README](utils/README.md) for details.
 
-- [Live demo on GH pages]()
-- Experimental [live demo with javascript syntax highlighting]() using [Prism.js](http://prismjs.com/)
+- [Live demo on GH pages](https://orbitbot.github.io/misbehave/)
+- Experimental [live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
 
 <br>
 
