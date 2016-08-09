@@ -4,6 +4,7 @@ import UndoManager from 'undo-manager'
 import StrUtil from './utils/string'
 import { withStartEnd, setSelection } from './utils/selection'
 import { nthOccurrance } from './utils/utils'
+import store from './utils/store'
 
 let undoMgr = new UndoManager()
 let strUtil = new StrUtil('\n', '\t')
@@ -14,9 +15,8 @@ const pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"', '"'], ['"', '"']]
 let code = {
 
   oninit : ({ state }) => {
-    state.content = m.prop({ prefix: '', selected: '', suffix: '' })
+    state.content = store({ prefix: '', selected: '', suffix: '' })
     window.content = state.content
-    state.content.map((x) => console.log(x))
 
     state.setDom = (value) => {
       state.dom.textContent = value.prefix + value.selected + value.suffix
