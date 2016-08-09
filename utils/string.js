@@ -22,6 +22,7 @@ export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
     prefix += '\n' + prevLine.match(/^\s*/)[0]
   }
   selected = ''
+  if (suffix === '') suffix = '\n'
   return { prefix, selected, suffix }
 }
 

@@ -1624,6 +1624,7 @@ var require$$0 = Object.freeze({
 	    prefix += '\n' + prevLine.match(/^\s*/)[0]
 	  }
 	  selected = ''
+	  if (suffix === '') suffix = '\n'
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
