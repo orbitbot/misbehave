@@ -6,7 +6,7 @@
 `misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the README]() for details.
 
 - [Live demo on GH pages]()
-- [Live demo with javascript syntax highlighting]() using [Prism.js](http://prismjs.com/)
+- Experimental [live demo with javascript syntax highlighting]() using [Prism.js](http://prismjs.com/)
 
 <br>
 
