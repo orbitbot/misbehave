@@ -1,5 +1,7 @@
 "use strict"
 
+import { allNewLines } from './utils'
+
 export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   // if surrounding parenthesis, indent to current depth
   // if opening curly brace, indent to current + tab
@@ -57,7 +59,7 @@ export let testOverwrite = (closing, prefix, selected, suffix) => {
 
 export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
   prefix += tab
-  selected = selected.replace(/\r\n|\r|\n/g, newLine + tab)
+  selected = selected.replace(allNewLines, newLine + tab)
   return { prefix, selected, suffix }
 }
 

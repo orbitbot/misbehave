@@ -2,46 +2,14 @@ import m from 'mithril'
 import Combokeys from 'combokeys'
 import UndoManager from 'undo-manager'
 import StrUtil from './utils/string'
+import { withStartEnd, setSelection } from './utils/selection'
+import { nthOccurrance } from './utils/utils'
 
 let undoMgr = new UndoManager()
 let strUtil = new StrUtil('\n', '\t')
 
+const pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"', '"'], ['"', '"']]
 
-const getLinePosition = (node) => {
-  let text = ''
-  let sibling = node.previousSibling
-  while (sibling) {
-    text += sibling.textContent
-    sibling = sibling.previousSibling
-  }
-  return text.split(/\r\n|\r|\n/).length - 1
-}
-const withSelection = (fn) => () => {
-  let sel = window.getSelection()
-  return fn(sel, sel.getRangeAt(0), getLinePosition(sel.anchorNode), sel.anchorOffset, getLinePosition(sel.focusNode), sel.focusOffset)
-}
-const withStartEnd = (fn) => {
-  return withSelection((selection, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
-    console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
-    // calls fn with (selection, range, startLine, startOffset, endLine, endOffset)
-    if (anchorLine == focusLine) {
-      return fn(selection, range, anchorLine, Math.min(anchorOffset, focusOffset), anchorLine, Math.max(anchorOffset, focusOffset))
-    } else if (anchorLine < focusLine) {
-      return fn(selection, range, anchorLine, anchorOffset, focusLine, focusOffset)
-    } else {
-      return fn(selection, range, focusLine, focusOffset, anchorLine, anchorOffset)
-    }
-  })
-}
-const nthOccurrance = (string, character, n) => {
-  // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
-  var count = 0, i = 0;
-  while (count < n && (i = string.indexOf(character, i) + 1)) {
-    count++;
-  }
-  if (count == n) return i;
-  return NaN;
-}
 
 let code = {
 
@@ -50,27 +18,12 @@ let code = {
     window.content = state.content
     state.content.map((x) => console.log(x))
 
-    state.setSelection = (elem, prefixLen, rngLen) => {
-      let node
-      if (elem.childNodes[0]) {
-        node = elem.childNodes[0]
-      } else {
-        node = elem
-        prefixLen, rngLen = 0
-      }
-      let selection = document.getSelection()
-      let range = document.createRange()
-      range.setStart(node, prefixLen)
-      range.setEnd(node, prefixLen + rngLen)
-      selection.removeAllRanges()
-      selection.addRange(range)
-    }
-
     state.setDom = (value) => {
       state.dom.textContent = value.prefix + value.selected + value.suffix
-      state.setSelection(state.dom, value.prefix.length, value.selected.length)
+      setSelection(state.dom, value.prefix.length, value.selected.length)
     }
 
+    // refactor updateDom => function to actually set dom with default noop
     state.updateContent = (update, updateDom) => {
       // this should probably track document selectionchange w/ activeElemet to have undo/redo block selections work,
       // eg selection on should be whatever it was before keydown when going backwards (messes up forward history navigation?)
@@ -112,7 +65,7 @@ let code = {
     }))
 
     state.keys.bind('backspace', state.extractSections((selection, range, prefix, selected, suffix) => {
-      if (selection.isCollapsed && strUtils.testAutoStrip(prefix, selected, suffix)) {
+      if (selection.isCollapsed && strUtil.testAutoStrip(prefix, selected, suffix)) {
         state.updateContent(strUtils.autoStrip(prefix, selected, suffix), true)
         return false
       }
@@ -142,7 +95,6 @@ let code = {
       })
     }
 
-    const pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"', '"'], ['"', '"']]
     pairs.forEach(([opening, closing]) => {
       state.keys.bind(opening, autoOpen(opening, closing))
       state.keys.bind(closing, overwrite(closing))
