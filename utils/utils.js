@@ -6,6 +6,8 @@ export let onNewLine = /\r\n|\r|\n/
 
 export let leadingWhitespace = /^\s*/
 
+export let allCharacters = /./g
+
 export let removeIfStartsWith = (s) => (line) => { return line.startsWith(s) ? line.slice(s.length) : line }
 
 export let defineNewLine = () => {
@@ -18,7 +20,6 @@ export let defineNewLine = () => {
 }
 
 export let nthOccurrance = (string, character, n) => {
-  // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
   var count = 0, i = 0;
   while (count < n && (i = string.indexOf(character, i) + 1)) {
     count++;

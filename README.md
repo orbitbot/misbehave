@@ -20,7 +20,7 @@ Misbehave has not yet gone through robust testing, so buyer beware. `#worksforme
 
 | feature    | description                                                                                        | misbehave             | behave.js                              |
 |:-----------|:---------------------------------------------------------------------------------------------------|:---------------------:|:--------------------------------------:|
-| undo/redo  | common keyboard combinations for undo and redo                                                     | custom implementation | uses browser functionality, has issues |
+| undo/redo  | press common keyboard combinations undo and redo edits                                             | custom implementation | uses browser functionality, has issues |
 | autoIndent | indent to previous line start by default, `()` and `{}` has special functionality                  | `Y`                   | `Y`                                    |
 | autoOpen   | if any of `({['"` are typed, their counterparts will also be added                                 | `Y`                   | `Y`                                    |
 | autoStrip  | if your cursor is between two paired characters, backspace will delete both                        | `Y`                   | `Y`                                    |

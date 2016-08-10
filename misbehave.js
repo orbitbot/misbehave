@@ -1596,6 +1596,8 @@ var require$$0 = Object.freeze({
 
 	var leadingWhitespace = /^\s*/
 
+	var allCharacters = /./g
+
 	var removeIfStartsWith = function (s) { return function (line) { return line.startsWith(s) ? line.slice(s.length) : line }; }
 
 	var defineNewLine = function () {
@@ -1608,7 +1610,6 @@ var require$$0 = Object.freeze({
 	}
 
 	var nthOccurrance = function (string, character, n) {
-	  // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
 	  var count = 0, i = 0;
 	  while (count < n && (i = string.indexOf(character, i) + 1)) {
 	    count++;
@@ -1629,7 +1630,7 @@ var require$$0 = Object.freeze({
 	  console.log('prevLine', JSON.stringify(prevLine))
 	  if (prefEnd === '(' && suffStart === ')') {
 	    var whitespace = prevLine.match(leadingWhitespace)[0]
-	    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(/./g, ' ')
+	    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(allCharacters, ' ')
 	  } else if (prefEnd === '{') {
 	    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab
 	    if (suffStart === '}')
@@ -1683,7 +1684,6 @@ var require$$0 = Object.freeze({
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
-	// todo : soft tab functionality, will only work with tab char
 	var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
 	  var lines = selected.split(onNewLine)
 	  if (lines.length === 1) {

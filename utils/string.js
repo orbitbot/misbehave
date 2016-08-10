@@ -1,6 +1,6 @@
 "use strict"
 
-import { leadingWhitespace, removeIfStartsWith, onNewLine, allNewLines } from './utils'
+import { leadingWhitespace, removeIfStartsWith, onNewLine, allNewLines, allCharacters } from './utils'
 
 export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   // if surrounding parenthesis, indent to current depth
@@ -14,7 +14,7 @@ export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   console.log('prevLine', JSON.stringify(prevLine))
   if (prefEnd === '(' && suffStart === ')') {
     let whitespace = prevLine.match(leadingWhitespace)[0]
-    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(/./g, ' ')
+    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(allCharacters, ' ')
   } else if (prefEnd === '{') {
     prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab
     if (suffStart === '}')
@@ -65,7 +65,6 @@ export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-// todo : soft tab functionality, will only work with tab char
 export let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   let lines = selected.split(onNewLine)
   if (lines.length === 1) {
