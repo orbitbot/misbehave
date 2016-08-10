@@ -40,14 +40,13 @@ export let autoStrip = (prefix, selected, suffix) => {
 }
 
 // pairs should be parameterised and not hardcoded
-export let testAutoStrip = (prefix, selected, suffix) => {
-  let prefEnd = prefix.slice(-1)
-  let suffStart = suffix.charAt(0)
-  return ((prefEnd === '(' && suffStart === ')') ||
-          (prefEnd === '{' && suffStart === '}') ||
-          (prefEnd === '[' && suffStart === ']') ||
-          (prefEnd === '"' && suffStart === '"') ||
-          (prefEnd === "'" && suffStart === "'"))
+export let testAutoStrip = (pairs, prefix, selected, suffix) => {
+  let result = false
+  pairs.forEach(([opening, closing]) => {
+    closing = closing ? closing : opening
+    if (prefix.slice(-1) === opening && suffix.charAt(0) === closing) result = true
+  })
+  return result
 }
 
 export let overwrite = (closing, prefix, selected, suffix) => {

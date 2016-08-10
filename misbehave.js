@@ -1655,14 +1655,16 @@ var require$$0 = Object.freeze({
 	}
 
 	// pairs should be parameterised and not hardcoded
-	var testAutoStrip = function (prefix, selected, suffix) {
-	  var prefEnd = prefix.slice(-1)
-	  var suffStart = suffix.charAt(0)
-	  return ((prefEnd === '(' && suffStart === ')') ||
-	          (prefEnd === '{' && suffStart === '}') ||
-	          (prefEnd === '[' && suffStart === ']') ||
-	          (prefEnd === '"' && suffStart === '"') ||
-	          (prefEnd === "'" && suffStart === "'"))
+	var testAutoStrip = function (pairs, prefix, selected, suffix) {
+	  var result = false
+	  pairs.forEach(function (ref) {
+	    var opening = ref[0];
+	    var closing = ref[1];
+
+	    closing = closing ? closing : opening
+	    if (prefix.slice(-1) === opening && suffix.charAt(0) === closing) result = true
+	  })
+	  return result
 	}
 
 	var overwrite = function (closing, prefix, selected, suffix) {
@@ -1846,7 +1848,7 @@ var require$$0 = Object.freeze({
 
 	  if (autoStrip) {
 	    keys.bind('backspace', extract(function (selection, range, prefix, selected, suffix) {
-	      if (selection.isCollapsed && strUtil.testAutoStrip(prefix, selected, suffix)) {
+	      if (selection.isCollapsed && strUtil.testAutoStrip(pairs, prefix, selected, suffix)) {
 	        update(strUtil.autoStrip(prefix, selected, suffix), true)
 	        return false
 	      }

@@ -68,7 +68,7 @@ export default class Misbehave {
 
     if (autoStrip) {
       keys.bind('backspace', extract((selection, range, prefix, selected, suffix) => {
-        if (selection.isCollapsed && strUtil.testAutoStrip(prefix, selected, suffix)) {
+        if (selection.isCollapsed && strUtil.testAutoStrip(pairs, prefix, selected, suffix)) {
           update(strUtil.autoStrip(prefix, selected, suffix), true)
           return false
         }
