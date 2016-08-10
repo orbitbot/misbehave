@@ -4,7 +4,7 @@ import Combokeys from 'combokeys'
 import UndoManager from 'undo-manager'
 import StrUtil from './utils/string'
 import { withStartEnd, setSelection } from './utils/selection'
-import { nthOccurrance } from './utils/utils'
+import { defineNewLine, nthOccurrance } from './utils/utils'
 import store from './utils/store'
 
 
@@ -19,7 +19,8 @@ export default class Misbehave {
                     } = {}) {
 
     let misbehave = this
-    let strUtil = new StrUtil('\n', '\t')
+    let newLine = defineNewLine()
+    let strUtil = new StrUtil(newLine, '\t')
 
     let undoMgr = new UndoManager()
     let current = store({ prefix: '', selected: '', suffix: '' })
@@ -41,7 +42,7 @@ export default class Misbehave {
 
     let extract = (fn) => {
       return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
-        let prefixIndex = nthOccurrance(elem.textContent, '\n', startLine) + startOffset
+        let prefixIndex = nthOccurrance(elem.textContent, newLine, startLine) + startOffset
         let prefix = elem.textContent.slice(0, prefixIndex)
         let selected = range.toString()
         let suffix = elem.textContent.slice(prefixIndex + selected.length)

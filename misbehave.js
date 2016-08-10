@@ -1594,6 +1594,15 @@ var require$$0 = Object.freeze({
 
 	var onNewLine = /\r\n|\r|\n/
 
+	var defineNewLine = function () {
+	  var ta = document.createElement('textarea')
+	  ta.value = '\n'
+	  if (ta.value.length === 2)
+	    return '\r\n';
+	  else
+	    return '\n';
+	}
+
 	var nthOccurrance = function (string, character, n) {
 	  // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
 	  var count = 0, i = 0;
@@ -1610,21 +1619,21 @@ var require$$0 = Object.freeze({
 	  // ++ if closing curly, put on own newline, indent to current
 	  //
 	  // otherwise indent to leading whitespace
-	  var prevLine = prefix.split('\n').splice(-1)[0]
+	  var prevLine = prefix.split(onNewLine).splice(-1)[0]
 	  console.log('prevLine', JSON.stringify(prevLine))
 	  var prefEnd = prefix.slice(-1)
 	  var suffStart = suffix.charAt(0)
 	  if (prefEnd === '(' && suffStart === ')') {
-	    prefix += '\n' + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
+	    prefix += newLine + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
 	  } else if (prefEnd === '{') {
-	    prefix += '\n' + prevLine.match(/^\s*/)[0] + '\t'
+	    prefix += newLine + prevLine.match(/^\s*/)[0] + '\t'
 	    if (suffStart === '}')
-	      suffix = '\n' + prevLine.match(/^\s*/)[0] + suffix
+	      suffix = newLine + prevLine.match(/^\s*/)[0] + suffix
 	  } else {
-	    prefix += '\n' + prevLine.match(/^\s*/)[0]
+	    prefix += newLine + prevLine.match(/^\s*/)[0]
 	  }
 	  selected = ''
-	  if (suffix === '') suffix = '\n'
+	  if (suffix === '') suffix = newLine
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
@@ -1668,7 +1677,7 @@ var require$$0 = Object.freeze({
 
 	// todo : soft tab functionality, will only work with tab char
 	var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
-	  var lines = selected.split('\n')
+	  var lines = selected.split(onNewLine)
 	  if (lines.length === 1) {
 	    if (prefix.slice(-1) === '\t')
 	      prefix = prefix.slice(0, -1)
@@ -1781,7 +1790,8 @@ var require$$0 = Object.freeze({
 
 
 	  var misbehave = this
-	  var strUtil = new StrUtil('\n', '\t')
+	  var newLine = defineNewLine()
+	  var strUtil = new StrUtil(newLine, '\t')
 
 	  var undoMgr = new UndoManager()
 	  var current = store({ prefix: '', selected: '', suffix: '' })
@@ -1803,7 +1813,7 @@ var require$$0 = Object.freeze({
 
 	  var extract = function (fn) {
 	    return withStartEnd(function (selection, range, startLine, startOffset, endLine, endOffset) {
-	      var prefixIndex = nthOccurrance(elem.textContent, '\n', startLine) + startOffset
+	      var prefixIndex = nthOccurrance(elem.textContent, newLine, startLine) + startOffset
 	      var prefix = elem.textContent.slice(0, prefixIndex)
 	      var selected = range.toString()
 	      var suffix = elem.textContent.slice(prefixIndex + selected.length)

@@ -1,6 +1,6 @@
 "use strict"
 
-import { allNewLines } from './utils'
+import { onNewLine, allNewLines } from './utils'
 
 export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   // if surrounding parenthesis, indent to current depth
@@ -8,21 +8,21 @@ export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   // ++ if closing curly, put on own newline, indent to current
   //
   // otherwise indent to leading whitespace
-  let prevLine = prefix.split('\n').splice(-1)[0]
+  let prevLine = prefix.split(onNewLine).splice(-1)[0]
   console.log('prevLine', JSON.stringify(prevLine))
   let prefEnd = prefix.slice(-1)
   let suffStart = suffix.charAt(0)
   if (prefEnd === '(' && suffStart === ')') {
-    prefix += '\n' + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
+    prefix += newLine + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
   } else if (prefEnd === '{') {
-    prefix += '\n' + prevLine.match(/^\s*/)[0] + '\t'
+    prefix += newLine + prevLine.match(/^\s*/)[0] + '\t'
     if (suffStart === '}')
-      suffix = '\n' + prevLine.match(/^\s*/)[0] + suffix
+      suffix = newLine + prevLine.match(/^\s*/)[0] + suffix
   } else {
-    prefix += '\n' + prevLine.match(/^\s*/)[0]
+    prefix += newLine + prevLine.match(/^\s*/)[0]
   }
   selected = ''
-  if (suffix === '') suffix = '\n'
+  if (suffix === '') suffix = newLine
   return { prefix, selected, suffix }
 }
 
@@ -66,7 +66,7 @@ export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
 
 // todo : soft tab functionality, will only work with tab char
 export let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
-  let lines = selected.split('\n')
+  let lines = selected.split(onNewLine)
   if (lines.length === 1) {
     if (prefix.slice(-1) === '\t')
       prefix = prefix.slice(0, -1)

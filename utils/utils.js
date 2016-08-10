@@ -4,6 +4,15 @@ export let allNewLines = /\r\n|\r|\n/g
 
 export let onNewLine = /\r\n|\r|\n/
 
+export let defineNewLine = () => {
+  let ta = document.createElement('textarea')
+  ta.value = '\n'
+  if (ta.value.length === 2)
+    return '\r\n';
+  else
+    return '\n';
+}
+
 export let nthOccurrance = (string, character, n) => {
   // might have issue on different platforms, see https://github.com/iamso/Behave.js/blob/master/behave.js#L147
   var count = 0, i = 0;
