@@ -26,11 +26,9 @@ Misbehave has not yet gone through robust testing, so buyer beware. `#worksforme
 | autoStrip  | if your cursor is between two paired characters, backspace will delete both                        | `Y`                   | `Y`                                    |
 | overwrite  | if you type a closing character directly before an identical one, it will overwrite instead of add | `Y`                   | `Y`                                    |
 | replaceTab | tab key indents instead of cycles focus, shift de-indents, similarly for multiline selections      | `Y`                   | `Y`                                    |
-| softTabs   | use spaces instead of tab characters                                                               |                       | `Y`                                    |
+| softTabs   | use spaces instead of tab characters                                                               | `Y`                   | `Y`                                    |
 
 - `misbehave`'s undo/redo is a naive implementation where each input is individually undoable and doesn't handle restoring selection perfectly
-- `misbehave`'s autoIndent doesn't yet work correct with regard to tabs / soft tabs
-- `misbehave` is going to support soft tabs and custom tab width
 
 <br>
 

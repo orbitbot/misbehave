@@ -1,6 +1,6 @@
 "use strict"
 
-import { onNewLine, allNewLines } from './utils'
+import { leadingWhitespace, removeIfStartsWith, onNewLine, allNewLines } from './utils'
 
 export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   // if surrounding parenthesis, indent to current depth
@@ -9,17 +9,18 @@ export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   //
   // otherwise indent to leading whitespace
   let prevLine = prefix.split(onNewLine).splice(-1)[0]
-  console.log('prevLine', JSON.stringify(prevLine))
   let prefEnd = prefix.slice(-1)
   let suffStart = suffix.charAt(0)
+  console.log('prevLine', JSON.stringify(prevLine))
   if (prefEnd === '(' && suffStart === ')') {
-    prefix += newLine + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
+    let whitespace = prevLine.match(leadingWhitespace)[0]
+    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(/./g, ' ')
   } else if (prefEnd === '{') {
-    prefix += newLine + prevLine.match(/^\s*/)[0] + '\t'
+    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab
     if (suffStart === '}')
-      suffix = newLine + prevLine.match(/^\s*/)[0] + suffix
+      suffix = newLine + prevLine.match(leadingWhitespace)[0] + suffix
   } else {
-    prefix += newLine + prevLine.match(/^\s*/)[0]
+    prefix += newLine + prevLine.match(leadingWhitespace)[0]
   }
   selected = ''
   if (suffix === '') suffix = newLine
@@ -38,6 +39,7 @@ export let autoStrip = (prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
+// pairs should be parameterised and not hardcoded
 export let testAutoStrip = (prefix, selected, suffix) => {
   let prefEnd = prefix.slice(-1)
   let suffStart = suffix.charAt(0)
@@ -68,16 +70,17 @@ export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
 export let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   let lines = selected.split(onNewLine)
   if (lines.length === 1) {
-    if (prefix.slice(-1) === '\t')
-      prefix = prefix.slice(0, -1)
+    if (prefix.endsWith(tab))
+      prefix = prefix.slice(0, tab.length)
     else
-      prefix += '\t' // indent instead
+      prefix += tab // indent instead
   } else {
-    if (prefix.slice(-1) === '\t') // should actually check if previous line starts with tab and remove
-      prefix = prefix.slice(0, -1)
-    lines = lines.map((line) => {
-      return line.replace(/^\t/, '')
-    })
+    let prevLine = prefix.split(onNewLine).splice(-1)[0]
+    let prevLength = prevLine.length
+
+    prevLine = removeIfStartsWith(tab)(prevLine)
+    prefix = prefix.slice(0, -prevLength) + prevLine
+    lines = lines.map(removeIfStartsWith(tab))
     selected = lines.join(newLine)
   }
   return { prefix, selected, suffix }

@@ -1594,6 +1594,10 @@ var require$$0 = Object.freeze({
 
 	var onNewLine = /\r\n|\r|\n/
 
+	var leadingWhitespace = /^\s*/
+
+	var removeIfStartsWith = function (s) { return function (line) { return line.startsWith(s) ? line.slice(s.length) : line }; }
+
 	var defineNewLine = function () {
 	  var ta = document.createElement('textarea')
 	  ta.value = '\n'
@@ -1620,17 +1624,18 @@ var require$$0 = Object.freeze({
 	  //
 	  // otherwise indent to leading whitespace
 	  var prevLine = prefix.split(onNewLine).splice(-1)[0]
-	  console.log('prevLine', JSON.stringify(prevLine))
 	  var prefEnd = prefix.slice(-1)
 	  var suffStart = suffix.charAt(0)
+	  console.log('prevLine', JSON.stringify(prevLine))
 	  if (prefEnd === '(' && suffStart === ')') {
-	    prefix += newLine + ' '.repeat(prevLine.length) // this should consider tabs/softTabs
+	    var whitespace = prevLine.match(leadingWhitespace)[0]
+	    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(/./g, ' ')
 	  } else if (prefEnd === '{') {
-	    prefix += newLine + prevLine.match(/^\s*/)[0] + '\t'
+	    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab
 	    if (suffStart === '}')
-	      suffix = newLine + prevLine.match(/^\s*/)[0] + suffix
+	      suffix = newLine + prevLine.match(leadingWhitespace)[0] + suffix
 	  } else {
-	    prefix += newLine + prevLine.match(/^\s*/)[0]
+	    prefix += newLine + prevLine.match(leadingWhitespace)[0]
 	  }
 	  selected = ''
 	  if (suffix === '') suffix = newLine
@@ -1649,6 +1654,7 @@ var require$$0 = Object.freeze({
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
+	// pairs should be parameterised and not hardcoded
 	var testAutoStrip = function (prefix, selected, suffix) {
 	  var prefEnd = prefix.slice(-1)
 	  var suffStart = suffix.charAt(0)
@@ -1679,16 +1685,17 @@ var require$$0 = Object.freeze({
 	var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
 	  var lines = selected.split(onNewLine)
 	  if (lines.length === 1) {
-	    if (prefix.slice(-1) === '\t')
-	      prefix = prefix.slice(0, -1)
+	    if (prefix.endsWith(tab))
+	      prefix = prefix.slice(0, tab.length)
 	    else
-	      prefix += '\t' // indent instead
+	      prefix += tab // indent instead
 	  } else {
-	    if (prefix.slice(-1) === '\t') // should actually check if previous line starts with tab and remove
-	      prefix = prefix.slice(0, -1)
-	    lines = lines.map(function (line) {
-	      return line.replace(/^\t/, '')
-	    })
+	    var prevLine = prefix.split(onNewLine).splice(-1)[0]
+	    var prevLength = prevLine.length
+
+	    prevLine = removeIfStartsWith(tab)(prevLine)
+	    prefix = prefix.slice(0, -prevLength) + prevLine
+	    lines = lines.map(removeIfStartsWith(tab))
 	    selected = lines.join(newLine)
 	  }
 	  return { prefix: prefix, selected: selected, suffix: suffix }
@@ -1791,7 +1798,7 @@ var require$$0 = Object.freeze({
 
 	  var misbehave = this
 	  var newLine = defineNewLine()
-	  var strUtil = new StrUtil(newLine, '\t')
+	  var strUtil = new StrUtil(newLine, softTabs ? ' '.repeat(softTabs) : '\t')
 
 	  var undoMgr = new UndoManager()
 	  var current = store({ prefix: '', selected: '', suffix: '' })

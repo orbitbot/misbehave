@@ -4,6 +4,10 @@ export let allNewLines = /\r\n|\r|\n/g
 
 export let onNewLine = /\r\n|\r|\n/
 
+export let leadingWhitespace = /^\s*/
+
+export let removeIfStartsWith = (s) => (line) => { return line.startsWith(s) ? line.slice(s.length) : line }
+
 export let defineNewLine = () => {
   let ta = document.createElement('textarea')
   ta.value = '\n'

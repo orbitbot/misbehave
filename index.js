@@ -20,7 +20,7 @@ export default class Misbehave {
 
     let misbehave = this
     let newLine = defineNewLine()
-    let strUtil = new StrUtil(newLine, '\t')
+    let strUtil = new StrUtil(newLine, softTabs ? ' '.repeat(softTabs) : '\t')
 
     let undoMgr = new UndoManager()
     let current = store({ prefix: '', selected: '', suffix: '' })
