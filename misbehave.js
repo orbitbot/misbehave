@@ -1777,7 +1777,7 @@ var require$$0 = Object.freeze({
 	  var overwrite = ref.overwrite; if ( overwrite === void 0 ) overwrite = true;
 	  var softTabs = ref.softTabs; if ( softTabs === void 0 ) softTabs = 2;
 	  var replaceTab = ref.replaceTab; if ( replaceTab === void 0 ) replaceTab = true;
-	  var pairs = ref.pairs; if ( pairs === void 0 ) pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"', '"'], ['"', '"']];
+	  var pairs = ref.pairs; if ( pairs === void 0 ) pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]];
 
 
 	  var misbehave = this
@@ -1836,24 +1836,38 @@ var require$$0 = Object.freeze({
 	    }))
 	  }
 
+	  var fnAutoOpen = function (opening, closing) { return extract(function (selection, range, prefix, selected, suffix) {
+	    update(strUtil.autoOpen(opening, closing, prefix, selected, suffix), true)
+	    return false
+	  }); }
+
+	  var fnOverwrite = function (closing) { return extract(function (selection, range, prefix, selected, suffix) {
+	    if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
+	      update(strUtil.overwrite(closing, prefix, selected, suffix), true)
+	      return false
+	    }
+	  }); }
+
 	  pairs.forEach(function (ref) {
 	    var opening = ref[0];
 	    var closing = ref[1];
 
-	    if (autoOpen) {
-	      keys.bind(opening, extract(function (selection, range, prefix, selected, suffix) {
-	        update(strUtil.autoOpen(opening, closing, prefix, selected, suffix), true)
-	        return false
-	      }))
-	    }
-
-	    if (overwrite) {
-	      keys.bind(closing, extract(function (selection, range, prefix, selected, suffix) {
-	        if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
-	          update(strUtil.overwrite(closing, prefix, selected, suffix), true)
+	    if (closing) {
+	      if (autoOpen)keys.bind(opening, fnAutoOpen(opening, closing))
+	      if (overwrite) keys.bind(closing, fnOverwrite(closing))
+	    } else {
+	      if (autoOpen && overwrite) {
+	        keys.bind(opening, extract(function (selection, range, prefix, selected, suffix) {
+	          if (selection.isCollapsed && strUtil.testOverwrite(opening, prefix, selected, suffix))
+	            update(strUtil.overwrite(opening, prefix, selected, suffix), true)
+	          else
+	            update(strUtil.autoOpen(opening, opening, prefix, selected, suffix), true)
 	          return false
-	        }
-	      }))
+	        }))
+	      } else {
+	        if (autoOpen)keys.bind(opening, fnAutoOpen(opening, opening))
+	        if (overwrite) keys.bind(opening, fnOverwrite(opening))
+	      }
 	    }
 	  })
 

@@ -15,7 +15,7 @@ export default class Misbehave {
                       overwrite = true,
                       softTabs = 2,
                       replaceTab = true,
-                      pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"', '"'], ['"', '"']]
+                      pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]]
                     } = {}) {
 
     let misbehave = this
@@ -74,21 +74,35 @@ export default class Misbehave {
       }))
     }
 
-    pairs.forEach(([opening, closing]) => {
-      if (autoOpen) {
-        keys.bind(opening, extract((selection, range, prefix, selected, suffix) => {
-          update(strUtil.autoOpen(opening, closing, prefix, selected, suffix), true)
-          return false
-        }))
-      }
+    let fnAutoOpen = (opening, closing) => extract((selection, range, prefix, selected, suffix) => {
+      update(strUtil.autoOpen(opening, closing, prefix, selected, suffix), true)
+      return false
+    })
 
-      if (overwrite) {
-        keys.bind(closing, extract((selection, range, prefix, selected, suffix) => {
-          if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
-            update(strUtil.overwrite(closing, prefix, selected, suffix), true)
+    let fnOverwrite = (closing) => extract((selection, range, prefix, selected, suffix) => {
+      if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
+        update(strUtil.overwrite(closing, prefix, selected, suffix), true)
+        return false
+      }
+    })
+
+    pairs.forEach(([opening, closing]) => {
+      if (closing) {
+        if (autoOpen)  keys.bind(opening, fnAutoOpen(opening, closing))
+        if (overwrite) keys.bind(closing, fnOverwrite(closing))
+      } else {
+        if (autoOpen && overwrite) {
+          keys.bind(opening, extract((selection, range, prefix, selected, suffix) => {
+            if (selection.isCollapsed && strUtil.testOverwrite(opening, prefix, selected, suffix))
+              update(strUtil.overwrite(opening, prefix, selected, suffix), true)
+            else
+              update(strUtil.autoOpen(opening, opening, prefix, selected, suffix), true)
             return false
-          }
-        }))
+          }))
+        } else {
+          if (autoOpen)  keys.bind(opening, fnAutoOpen(opening, opening))
+          if (overwrite) keys.bind(opening, fnOverwrite(opening))
+        }
       }
     })
 
