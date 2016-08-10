@@ -69,7 +69,7 @@ export let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   let lines = selected.split(onNewLine)
   if (lines.length === 1) {
     if (prefix.endsWith(tab))
-      prefix = prefix.slice(0, tab.length)
+      prefix = prefix.slice(0, -tab.length)
     else
       prefix += tab // indent instead
   } else {
