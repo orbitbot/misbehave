@@ -39,7 +39,6 @@ export let autoStrip = (prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-// pairs should be parameterised and not hardcoded
 export let testAutoStrip = (pairs, prefix, selected, suffix) => {
   let result = false
   pairs.forEach(([opening, closing]) => {
@@ -60,7 +59,7 @@ export let testOverwrite = (closing, prefix, selected, suffix) => {
 }
 
 export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
-  prefix += tab
+  prefix += tab // if softtabs, this should indent to the next even tab width, not blindly add spaces
   selected = selected.replace(allNewLines, newLine + tab)
   return { prefix, selected, suffix }
 }
