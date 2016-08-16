@@ -1,5 +1,4 @@
 let chai = require('chai');
-let assert = chai.assert;
 let should = chai.should();
 
 let string = require('../utils/string')

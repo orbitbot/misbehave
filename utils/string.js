@@ -48,6 +48,7 @@ let autoStrip = (prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
+// content in selection is handled in index.js
 let testAutoStrip = (pairs, prefix, selected, suffix) => {
   let result = false
   pairs.forEach(([opening, closing]) => {
@@ -63,6 +64,7 @@ let overwrite = (closing, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
+// content in selection is handled in index.js
 let testOverwrite = (closing, prefix, selected, suffix) => {
   return suffix.charAt(0) === closing
 }
