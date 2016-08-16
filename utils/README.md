@@ -24,6 +24,8 @@ All of the below methods return an object `{ prefix, selected, suffix }`, which 
 
 **`autoIndent(newLine, tab, prefix, selected, suffix)`**
 
+Automatic indentation is an action typically tied to the enter keypress, the intent being to continue typing at the appropriate indentation level for the current code block.
+
 
 **`autoOpen(opening, closing, prefix, selected, suffix)`**
 

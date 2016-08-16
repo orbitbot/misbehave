@@ -1,9 +1,16 @@
 "use strict"
 
-import { leadingWhitespace, removeIfStartsWith, onNewLine, allNewLines, allCharacters } from './utils'
+let utils = require('./utils')
+let leadingWhitespace = utils.leadingWhitespace
+let removeIfStartsWith = utils.removeIfStartsWith
+let onNewLine = utils.onNewLine
+let allNewLines = utils.allNewLines
+let allCharacters = utils.allCharacters
 
-export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
+
+let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   // if surrounding parenthesis, indent to current depth
+  //    => should be: if previous line contains an opening parenthesis, indent to last one on line, no matter if closing parenthesis exists or there is a parenthesis defined
   // if opening curly brace, indent to current + tab
   // ++ if closing curly, put on own newline, indent to current
   //
@@ -27,19 +34,19 @@ export let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-export let autoOpen = (opening, closing, prefix, selected, suffix) => {
+let autoOpen = (opening, closing, prefix, selected, suffix) => {
   prefix += opening
   suffix = closing + suffix
   return { prefix, selected, suffix }
 }
 
-export let autoStrip = (prefix, selected, suffix) => {
+let autoStrip = (prefix, selected, suffix) => {
   prefix = prefix.slice(0, -1)
   suffix = suffix.slice(1)
   return { prefix, selected, suffix }
 }
 
-export let testAutoStrip = (pairs, prefix, selected, suffix) => {
+let testAutoStrip = (pairs, prefix, selected, suffix) => {
   let result = false
   pairs.forEach(([opening, closing]) => {
     closing = closing ? closing : opening
@@ -48,23 +55,23 @@ export let testAutoStrip = (pairs, prefix, selected, suffix) => {
   return result
 }
 
-export let overwrite = (closing, prefix, selected, suffix) => {
+let overwrite = (closing, prefix, selected, suffix) => {
   prefix += closing
   suffix = suffix.slice(1)
   return { prefix, selected, suffix }
 }
 
-export let testOverwrite = (closing, prefix, selected, suffix) => {
+let testOverwrite = (closing, prefix, selected, suffix) => {
   return suffix.charAt(0) === closing
 }
 
-export let tabIndent = (newLine, tab, prefix, selected, suffix) => {
+let tabIndent = (newLine, tab, prefix, selected, suffix) => {
   prefix += tab // if softtabs, this should indent to the next even tab width, not blindly add spaces
   selected = selected.replace(allNewLines, newLine + tab)
   return { prefix, selected, suffix }
 }
 
-export let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
+let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   let lines = selected.split(onNewLine)
   if (lines.length === 1) {
     if (prefix.endsWith(tab))
@@ -83,7 +90,7 @@ export let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-export default function StrUtil(newLine, tab) {
+function StrUtil(newLine, tab) {
   return {
     autoIndent    : (...args) => autoIndent(newLine, tab, ...args),
     autoOpen      : autoOpen,
@@ -95,3 +102,13 @@ export default function StrUtil(newLine, tab) {
     tabUnindent   : (...args) => tabUnindent(newLine, tab, ...args)
   }
 }
+
+exports.autoIndent = autoIndent;
+exports.autoOpen = autoOpen;
+exports.autoStrip = autoStrip;
+exports.testAutoStrip = testAutoStrip;
+exports.overwrite = overwrite;
+exports.testOverwrite = testOverwrite;
+exports.tabIndent = tabIndent;
+exports.tabUnindent = tabUnindent;
+exports['default'] = StrUtil;
