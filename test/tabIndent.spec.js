@@ -31,7 +31,7 @@ describe('tabIndent', () => {
   describe('soft tabs', () => {
     it('indents to the next even soft tab width', () => {
       let fst = string.tabIndent('\n', '   ', 'function', '', '\n')
-      fst.prefix.should.equal('function   ')
+      fst.prefix.should.equal('function ')
       fst.selected.should.equal('')
       fst.suffix.should.equal('\n')
 
