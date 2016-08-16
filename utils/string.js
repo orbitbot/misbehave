@@ -70,8 +70,20 @@ let testOverwrite = (closing, prefix, selected, suffix) => {
 }
 
 let tabIndent = (newLine, tab, prefix, selected, suffix) => {
-  prefix += tab // if softtabs, this should indent to the next even tab width, not blindly add spaces
-  selected = selected.replace(allNewLines, newLine + tab)
+  let prefLines = prefix.split(onNewLine)
+  let prevLine = prefLines.splice(-1)[0]
+
+  if (selected === '') {
+    if (tab === '\t' || prevLine.length % tab.length === 0) {
+      prefix += tab
+    } else {
+      prefix += ' '.repeat(tab.length - prevLine.length % tab.length)
+    }
+  } else {
+    prevLine = tab + prevLine
+    prefix = prefLines.concat(prevLine).join(newLine)
+    selected = selected.replace(allNewLines, newLine + tab)
+  }
   return { prefix, selected, suffix }
 }
 

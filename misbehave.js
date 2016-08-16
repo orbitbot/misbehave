@@ -1590,6 +1590,11 @@ var require$$0 = Object.freeze({
 
 	var UndoManager = interopDefault(undomanager);
 
+	var utils = createCommonjsModule(function (module, exports) {
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', { value: true });
+
 	var allNewLines = /\r\n|\r|\n/g
 
 	var onNewLine = /\r\n|\r|\n/
@@ -1618,8 +1623,51 @@ var require$$0 = Object.freeze({
 	  return NaN;
 	}
 
+	exports.allNewLines = allNewLines;
+	exports.onNewLine = onNewLine;
+	exports.leadingWhitespace = leadingWhitespace;
+	exports.allCharacters = allCharacters;
+	exports.removeIfStartsWith = removeIfStartsWith;
+	exports.defineNewLine = defineNewLine;
+	exports.nthOccurrance = nthOccurrance;
+	});
+
+	var utils$1 = interopDefault(utils);
+	var nthOccurrance = utils.nthOccurrance;
+	var defineNewLine = utils.defineNewLine;
+	var removeIfStartsWith = utils.removeIfStartsWith;
+	var allCharacters = utils.allCharacters;
+	var leadingWhitespace = utils.leadingWhitespace;
+	var onNewLine = utils.onNewLine;
+	var allNewLines = utils.allNewLines;
+
+var require$$0$9 = Object.freeze({
+	  default: utils$1,
+	  nthOccurrance: nthOccurrance,
+	  defineNewLine: defineNewLine,
+	  removeIfStartsWith: removeIfStartsWith,
+	  allCharacters: allCharacters,
+	  leadingWhitespace: leadingWhitespace,
+	  onNewLine: onNewLine,
+	  allNewLines: allNewLines
+	});
+
+	var string = createCommonjsModule(function (module, exports) {
+	"use strict"
+
+	Object.defineProperty(exports, '__esModule', { value: true });
+
+	var utils = interopDefault(require$$0$9)
+	var leadingWhitespace = utils.leadingWhitespace
+	var removeIfStartsWith = utils.removeIfStartsWith
+	var onNewLine = utils.onNewLine
+	var allNewLines = utils.allNewLines
+	var allCharacters = utils.allCharacters
+
+
 	var autoIndent = function (newLine, tab, prefix, selected, suffix) {
 	  // if surrounding parenthesis, indent to current depth
+	  //    => should be: if previous line contains an opening parenthesis, indent to last one on line, no matter if closing parenthesis exists or there is a parenthesis defined
 	  // if opening curly brace, indent to current + tab
 	  // ++ if closing curly, put on own newline, indent to current
 	  //
@@ -1655,7 +1703,7 @@ var require$$0 = Object.freeze({
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
-	// pairs should be parameterised and not hardcoded
+	// content in selection is handled in index.js
 	var testAutoStrip = function (pairs, prefix, selected, suffix) {
 	  var result = false
 	  pairs.forEach(function (ref) {
@@ -1674,13 +1722,26 @@ var require$$0 = Object.freeze({
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
+	// content in selection is handled in index.js
 	var testOverwrite = function (closing, prefix, selected, suffix) {
 	  return suffix.charAt(0) === closing
 	}
 
 	var tabIndent = function (newLine, tab, prefix, selected, suffix) {
-	  prefix += tab
-	  selected = selected.replace(allNewLines, newLine + tab)
+	  var prefLines = prefix.split(onNewLine)
+	  var prevLine = prefLines.splice(-1)[0]
+
+	  if (selected === '') {
+	    if (tab === '\t' || prevLine.length % tab.length === 0) {
+	      prefix += tab
+	    } else {
+	      prefix += ' '.repeat(tab.length - prevLine.length % tab.length)
+	    }
+	  } else {
+	    prevLine = tab + prevLine
+	    prefix = prefLines.concat(prevLine).join(newLine)
+	    selected = selected.replace(allNewLines, newLine + tab)
+	  }
 	  return { prefix: prefix, selected: selected, suffix: suffix }
 	}
 
@@ -1730,6 +1791,19 @@ var require$$0 = Object.freeze({
 	  }
 	  }
 	}
+
+	exports.autoIndent = autoIndent;
+	exports.autoOpen = autoOpen;
+	exports.autoStrip = autoStrip;
+	exports.testAutoStrip = testAutoStrip;
+	exports.overwrite = overwrite;
+	exports.testOverwrite = testOverwrite;
+	exports.tabIndent = tabIndent;
+	exports.tabUnindent = tabUnindent;
+	exports['default'] = StrUtil;
+	});
+
+	var StrUtil = interopDefault(string);
 
 	var getLinePosition = function (node) {
 	  var text = ''
