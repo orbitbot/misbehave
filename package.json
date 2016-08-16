@@ -4,21 +4,22 @@
   "description": "Add IDE-like text entry to HTML contenteditable tags",
   "main": "index.js",
   "scripts": {
-    "start": "rollup --config --watch"
+    "start": "rollup --config --watch",
+    "test": "mocha -R spec test/**"
   },
-  "keywords": [],
-  "author": "Patrik Johnson",
-  "license": "MIT",
-  "files": [
-    "misbehave.js"
-  ],
   "keywords": [
     "contenteditable",
     "IDE",
     "formatting"
   ],
   "author": "Patrik Johnson <patrik@zebros.fi>",
+  "license": "MIT",
+  "files": [
+    "misbehave.js"
+  ],
   "devDependencies": {
+    "chai": "3.5.0",
+    "mocha": "3.0.2",
     "rollup": "0.34.7",
     "rollup-plugin-buble": "0.12.1",
     "rollup-plugin-commonjs": "3.3.1",

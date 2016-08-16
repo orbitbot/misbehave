@@ -1,5 +1,7 @@
 "use strict"
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 let utils = require('./utils')
 let leadingWhitespace = utils.leadingWhitespace
 let removeIfStartsWith = utils.removeIfStartsWith
