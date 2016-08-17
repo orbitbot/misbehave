@@ -1747,13 +1747,19 @@ var require$$0$9 = Object.freeze({
 
 	var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
 	  var lines = selected.split(onNewLine)
+	  var prevLine = prefix.split(onNewLine).splice(-1)[0]
+
 	  if (lines.length === 1) {
 	    if (prefix.endsWith(tab))
 	      prefix = prefix.slice(0, -tab.length)
-	    else
-	      prefix += tab // indent instead
+	    else { // indent instead
+	      if (tab === '\t' || prevLine.length % tab.length === 0) {
+	        prefix += tab
+	      } else {
+	        prefix += ' '.repeat(tab.length - prevLine.length % tab.length)
+	      }
+	    }
 	  } else {
-	    var prevLine = prefix.split(onNewLine).splice(-1)[0]
 	    var prevLength = prevLine.length
 
 	    prevLine = removeIfStartsWith(tab)(prevLine)

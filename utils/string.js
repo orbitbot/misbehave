@@ -89,13 +89,19 @@ let tabIndent = (newLine, tab, prefix, selected, suffix) => {
 
 let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   let lines = selected.split(onNewLine)
+  let prevLine = prefix.split(onNewLine).splice(-1)[0]
+
   if (lines.length === 1) {
     if (prefix.endsWith(tab))
       prefix = prefix.slice(0, -tab.length)
-    else
-      prefix += tab // indent instead
+    else { // indent instead
+      if (tab === '\t' || prevLine.length % tab.length === 0) {
+        prefix += tab
+      } else {
+        prefix += ' '.repeat(tab.length - prevLine.length % tab.length)
+      }
+    }
   } else {
-    let prevLine = prefix.split(onNewLine).splice(-1)[0]
     let prevLength = prevLine.length
 
     prevLine = removeIfStartsWith(tab)(prevLine)
