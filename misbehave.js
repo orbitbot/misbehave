@@ -1666,19 +1666,13 @@ var require$$0$9 = Object.freeze({
 
 
 	var autoIndent = function (newLine, tab, prefix, selected, suffix) {
-	  // if surrounding parenthesis, indent to current depth
-	  //    => should be: if previous line contains an opening parenthesis, indent to last one on line, no matter if closing parenthesis exists or there is a parenthesis defined
-	  // if opening curly brace, indent to current + tab
-	  // ++ if closing curly, put on own newline, indent to current
-	  //
-	  // otherwise indent to leading whitespace
 	  var prevLine = prefix.split(onNewLine).splice(-1)[0]
 	  var prefEnd = prefix.slice(-1)
 	  var suffStart = suffix.charAt(0)
 	  console.log('prevLine', JSON.stringify(prevLine))
-	  if (prefEnd === '(' && suffStart === ')') {
+	  if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
 	    var whitespace = prevLine.match(leadingWhitespace)[0]
-	    prefix += newLine + whitespace + prevLine.slice(whitespace.length).replace(allCharacters, ' ')
+	    prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ')
 	  } else if (prefEnd === '{') {
 	    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab
 	    if (suffStart === '}')
