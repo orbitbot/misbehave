@@ -47,7 +47,7 @@ export default class Misbehave {
         let selected = range.toString()
         let suffix = elem.textContent.slice(prefixIndex + selected.length)
 
-        console.info('extracted', [prefix, selected, suffix])
+        // console.info('extracted', [prefix, selected, suffix])
 
         return fn(selection, range, prefix, selected, suffix)
       })

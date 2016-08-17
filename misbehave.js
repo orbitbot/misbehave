@@ -1669,7 +1669,7 @@ var require$$0$9 = Object.freeze({
 	  var prevLine = prefix.split(onNewLine).splice(-1)[0]
 	  var prefEnd = prefix.slice(-1)
 	  var suffStart = suffix.charAt(0)
-	  console.log('prevLine', JSON.stringify(prevLine))
+
 	  if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
 	    var whitespace = prevLine.match(leadingWhitespace)[0]
 	    prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ')
@@ -1822,7 +1822,7 @@ var require$$0$9 = Object.freeze({
 
 	var withStartEnd = function (fn) {
 	  return withSelection(function (selection, range, anchorLine, anchorOffset, focusLine, focusOffset) {
-	    console.log(("start l,r " + (anchorLine + ' ' + anchorOffset) + " end l,r " + (focusLine + ' ' + focusOffset)))
+	    // console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
 	    // calls fn with (selection, range, startLine, startOffset, endLine, endOffset)
 	    if (anchorLine == focusLine) {
 	      return fn(selection, range, anchorLine, Math.min(anchorOffset, focusOffset), anchorLine, Math.max(anchorOffset, focusOffset))
@@ -1854,7 +1854,7 @@ var require$$0$9 = Object.freeze({
 	  function gettersetter() {
 	    if (arguments.length) {
 	      value = arguments[0]
-	      console.log(value)
+	      // console.log(value)
 	    }
 	    return value
 	  }
@@ -1901,7 +1901,7 @@ var require$$0$9 = Object.freeze({
 	      var selected = range.toString()
 	      var suffix = elem.textContent.slice(prefixIndex + selected.length)
 
-	      console.info('extracted', [prefix, selected, suffix])
+	      // console.info('extracted', [prefix, selected, suffix])
 
 	      return fn(selection, range, prefix, selected, suffix)
 	    })

@@ -19,7 +19,7 @@ export let withSelection = (fn) => () => {
 
 export let withStartEnd = (fn) => {
   return withSelection((selection, range, anchorLine, anchorOffset, focusLine, focusOffset) => {
-    console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
+    // console.log(`start l,r ${ anchorLine + ' ' + anchorOffset } end l,r ${ focusLine + ' ' + focusOffset }`)
     // calls fn with (selection, range, startLine, startOffset, endLine, endOffset)
     if (anchorLine == focusLine) {
       return fn(selection, range, anchorLine, Math.min(anchorOffset, focusOffset), anchorLine, Math.max(anchorOffset, focusOffset))

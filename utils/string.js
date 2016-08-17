@@ -14,7 +14,7 @@ let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   let prevLine = prefix.split(onNewLine).splice(-1)[0]
   let prefEnd = prefix.slice(-1)
   let suffStart = suffix.charAt(0)
-  console.log('prevLine', JSON.stringify(prevLine))
+
   if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
     let whitespace = prevLine.match(leadingWhitespace)[0]
     prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ')
