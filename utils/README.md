@@ -4,7 +4,7 @@
 
 Because of the above, the implementations in `misbehave` can be re-used elsewhere you require similar functionality in javascript. The rest of this README outlines the functionality of the provided methods with some examples.
 
-In the following examples, the characters `>` and `<` are used to indicate the start and end of the selected text, if any. As an example, in the case of `"demonstration><"` the cursor is directly after the full word with no text highlighted, and with `"plato >units <of bitterness"` the substring `units ` (including the space after the word) is selected. Consequently,
+In the following examples, the characters `>` and `<` are used to indicate the start and end of the selected text, if any, and do not themselves actually count as characters. As an example, in the case of `"demonstration><"` the cursor is directly after the full word with no text highlighted, and with `"plato >units <of bitterness"` the substring `units ` (including the space after the word) is selected. Consequently,
 
 ```js
 var json = >{
@@ -24,26 +24,182 @@ All of the below methods return an object `{ prefix, selected, suffix }`, which 
 
 **`autoIndent(newLine, tab, prefix, selected, suffix)`**
 
-Automatic indentation is an action typically tied to the enter keypress, the intent being to continue typing at the appropriate indentation level for the current code block.
+Automatic indentation is an action typically tied to the enter keypress, the intent being to continue typing at the appropriate indentation level for the current code block. By default, this method will add the same leading whitespace as the previous line:
 
+
+```
+var json = {
+  "dom": "complicated",><
+}
+
+// input enter ==>
+
+var json = {
+  "dom": "complicated",
+  ><
+}
+```
+
+If you have more opening than closing parentheses on the previous line, the indentation will be to the last opening parenthesis, allowing f.e. function parameters to be written vertically:
+
+
+```
+    var myFun = function(first><
+
+// input enter ==>
+
+    var myFun = function(first
+                         ><
+```
+
+The final functionality provided is typical behaviour for curly braces. If the previous character is an opening curly brace, the next line will be indented to the leading whitespace and the tab character provided, and if there's a closing curly brace this will be placed on its own line indented to the leading whitespace:
+
+```
+    function() {><
+
+// input enter ==>
+
+    function() {
+        ><
+
+// and
+
+    function() {><}
+
+// input enter ==>
+
+    function() {
+        ><
+    }
+```
+
+<br>
 
 **`autoOpen(opening, closing, prefix, selected, suffix)`**
 
+Automatically matching opening and closing characters is typically implemented for braces and single- and double quotes (`([{` and `'"`). Whenever a user types one of the opening characters the closing character will be added to the text after the selection, both without and with selected text:
+
+```
+function><
+
+// input ( ==>
+
+function(><)
+
+// and
+
+var quote = >inconceivable<
+
+// input " ==>
+
+var quote = ">inconceivable<"
+```
+
+<br>
 
 **`autoStrip(prefix, selected, suffix)`**
 
+If a user has the cursor between paired characters (such as the ones discussed in autoOpen), backspace will remove both characters.
+
+```
+function(><)
+
+// input backspace ==>
+
+function><
+```
+
+<br>
 
 **`testAutoStrip(pairs, prefix, selected, suffix)`**
 
+Returns `true` if prefix and suffix start with a matching character pair, `false otherwise. Valid character pairs are defined by the pairs parameter, which should be an array containing arrays of valid opening and closing characters. The outer array can also contain single element arrays when a matching pair is formed by identical characters.
+
+The default pairs are defined as
+
+```
+pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]]
+```
+
+<br>
 
 **`overwrite(closing, prefix, selected, suffix)`**
 
+If a closing character is typed directly before the identical character, overwrite the character instead of adding a new one.
+
+```
+function(><)
+
+// input ) ==>
+
+function()><
+```
+
+<br>
 
 **`testOverwrite(closing, prefix, selected, suffix)`**
 
+Returns `true` if the suffix starts with the parameter closing characer, `false` otherwise.
+
+<br>
 
 **`tabIndent(newLine, tab, prefix, selected, suffix)`**
 
+Code indentation is used for alignment and maintaining readable code, tab indent will add soft or hard tabs depending on the selection. If no text is selected, the cursor will be indented to the next even tab. If multiple lines are selected, a tab will be added to the start of the selected lines.
+
+```
+    function()><
+
+// input tab ==>
+
+    function()  ><
+
+// and
+
+    >function() {
+        return 42
+    }<
+
+// input tab ==>
+
+        >function() {
+            return 42
+        }<
+
+```
+
+<br>
 
 **`tabUnindent(newLine, tab, prefix, selected, suffix)`**
 
+Removes tab-like text based on the selection. If the selection is on a single line and the text before the selection ends with a tab-like, the tab is removed, otherwise the selection will be tab-*indented* instead. If multiple lines are selected, one tab-like will be removed from the start of all lines selected, including the line where the selection starts.
+
+
+```
+    function()  ><
+
+// input shift + tab ==>
+
+    function()><
+
+// and
+
+        >function() {
+            return 42
+        }<
+
+// input shift + tab ==>
+
+    >function() {
+        return 42
+    }<
+
+// but indents if there is no tab before selection
+
+    fun><ction
+
+// input shift + tab ==>
+
+    fun ><ction
+
+```
