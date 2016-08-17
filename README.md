@@ -3,7 +3,7 @@
 
 `misbehave` is a small library for adding IDE-like text entry to HTML `contenteditable` tags, inspired by [behave.js](https://github.com/iamso/Behave.js). When you need something, but [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) seem large (they're probably more robust, so pick your poison).
 
-`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the README](utils/README.md) for details. The indentation behaviour for `misbehave` is currently hardcoded for javascript code entry, and may not perform to expectations if used for other languages.
+`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the utils README](utils/README.md) for details. The indentation behaviour for `misbehave` is currently hardcoded for javascript code entry, and may not perform to expectations if used for other languages.
 
 - [Live demo on GH pages](https://orbitbot.github.io/misbehave/)
 - Experimental [live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
@@ -27,8 +27,10 @@ Misbehave has not yet gone through robust testing, so buyer beware. `#worksforme
 | overwrite  | if you type a closing character directly before an identical one, it will overwrite instead of add | `Y`                   | `Y`                                    |
 | replaceTab | tab key indents instead of cycles focus, shift de-indents, similarly for multiline selections      | `Y`                   | `Y`                                    |
 | softTabs   | use spaces instead of tab characters                                                               | `Y`                   | `Y`                                    |
+| code fence | exclude areas from editing functionality with magic string                                         | `N/A`                 | `Y`                                    |
 
 - `misbehave`'s undo/redo is a naive implementation where each input is individually undoable and doesn't handle restoring selection perfectly. Undo history is also unlimited, which therefore might cause memory issues over time
+- `misbehave` works on `contenteditable` HTML tags, whereas `behave.js` is implemented for textareas
 
 <br>
 
