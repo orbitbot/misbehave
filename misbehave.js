@@ -1,5 +1,8 @@
-var Misbehave = (function () {
-	'use strict';
+(function (global, factory) {
+	typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+	typeof define === 'function' && define.amd ? define('Misbehave', factory) :
+	(global.Misbehave = factory());
+}(this, function () { 'use strict';
 
 	function interopDefault(ex) {
 		return ex && typeof ex === 'object' && 'default' in ex ? ex['default'] : ex;
@@ -2000,4 +2003,4 @@ var require$$0$9 = Object.freeze({
 
 	return Misbehave;
 
-}());
+}));

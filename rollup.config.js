@@ -6,7 +6,8 @@ import filesize    from 'rollup-plugin-filesize';
 module.exports = {
   entry      : 'index.js',
   dest       : 'misbehave.js',
-  format     : 'iife',
+  format     : 'umd',
+  moduleId   : 'Misbehave',
   moduleName : 'Misbehave',
   plugins    : [
     nodeResolve({ jsnext: true, main: true, browser: true }),

@@ -2,7 +2,7 @@
   "name": "misbehave",
   "version": "0.0.3",
   "description": "Add IDE-like text entry to HTML contenteditable tags",
-  "main": "index.js",
+  "main": "misbehave.js",
   "scripts": {
     "start": "rollup --config --watch",
     "test": "mocha -R spec test/**"
