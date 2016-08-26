@@ -1873,6 +1873,7 @@ var require$$0$9 = Object.freeze({
 	  var softTabs = ref.softTabs; if ( softTabs === void 0 ) softTabs = 2;
 	  var replaceTab = ref.replaceTab; if ( replaceTab === void 0 ) replaceTab = true;
 	  var pairs = ref.pairs; if ( pairs === void 0 ) pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]];
+	  var onchange = ref.onchange;
 
 
 	  var misbehave = this
@@ -1894,6 +1895,7 @@ var require$$0$9 = Object.freeze({
 	      redo : function () { setDom(update) }
 	    })
 	    current(update)
+	    if (onchange) onchange(update.prefix + update.selected + update.suffix)
 	    if (updateDom) setDom(update)
 	  }
 
@@ -1982,6 +1984,8 @@ var require$$0$9 = Object.freeze({
 	  var inputListener = elem.addEventListener('input', extract(function (selection, range, prefix, selected, suffix) {
 	    update({ prefix: prefix, selected: selected, suffix: suffix })
 	  }))
+
+	  if (onchange) onchange(elem.textContent)
 
 	  // expose for haxxoers
 	  misbehave.__elem = elem

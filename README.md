@@ -36,6 +36,7 @@ Misbehave has not yet gone through robust testing, so buyer beware. `#worksforme
 
 <!-- installation -->
 <!-- Usage -->
+<!-- ... onchange -->
 <!-- Usage with Prism.js -->
 
 <br>

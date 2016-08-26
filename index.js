@@ -15,7 +15,8 @@ export default class Misbehave {
                       overwrite = true,
                       softTabs = 2,
                       replaceTab = true,
-                      pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]]
+                      pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]],
+                      onchange
                     } = {}) {
 
     let misbehave = this
@@ -37,6 +38,7 @@ export default class Misbehave {
         redo : () => { setDom(update) }
       })
       current(update)
+      if (onchange) onchange(update.prefix + update.selected + update.suffix)
       if (updateDom) setDom(update)
     }
 
@@ -122,6 +124,8 @@ export default class Misbehave {
     let inputListener = elem.addEventListener('input', extract((selection, range, prefix, selected, suffix) => {
       update({ prefix, selected, suffix })
     }))
+
+    if (onchange) onchange(elem.textContent)
 
     // expose for haxxoers
     misbehave.__elem = elem
