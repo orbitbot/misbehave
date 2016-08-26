@@ -1997,7 +1997,7 @@ var require$$0$9 = Object.freeze({
 
 	Misbehave.prototype.destroy = function destroy () {
 	  this.__elem.removeEventListener('input', this.__inputListener)
-	  this.__keys.destroy()
+	  this.__keys.detach()
 	  this.__undoMgr.clear()
 	};
 
