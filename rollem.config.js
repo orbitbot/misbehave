@@ -3,9 +3,8 @@ import commonjs    from 'rollup-plugin-commonjs';
 import buble       from 'rollup-plugin-buble';
 import filesize    from 'rollup-plugin-filesize';
 
-module.exports = {
+let common = {
   entry      : 'index.js',
-  dest       : 'misbehave.js',
   format     : 'umd',
   moduleId   : 'Misbehave',
   moduleName : 'Misbehave',
@@ -15,4 +14,9 @@ module.exports = {
     buble(),
     filesize()
   ]
-};
+}
+
+module.exports = [
+  Object.assign(common, { dest: 'misbehave.js' }),
+  Object.assign(common, { dest: 'docs/lib/misbehave.js' }),
+]
