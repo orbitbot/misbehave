@@ -12,7 +12,7 @@
 
 **Experimental**
 
-Misbehave has not yet gone through robust testing, so buyer beware. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
+Misbehave has not gone through exhaustive testing, so buyer beware. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
 
 <br>
 

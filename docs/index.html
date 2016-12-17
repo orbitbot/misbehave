@@ -68,7 +68,7 @@ code {
   <script src="../misbehave.js"></script>
   <script>
     var code = document.querySelector('#code')
-    var misbehave = new Misbehave(code, { onchange : function(content) { console.log('onchange', content)}})
+    var misbehave = new Misbehave(code)
 
     var pre = document.querySelector('#pre')
     pre.onclick = function() {

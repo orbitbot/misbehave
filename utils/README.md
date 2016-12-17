@@ -77,7 +77,7 @@ The final functionality provided is typical behaviour for curly braces. If the p
 
 **`autoOpen(opening, closing, prefix, selected, suffix)`**
 
-Automatically matching opening and closing characters is typically implemented for braces and single- and double quotes (`([{` and `'"`). Whenever a user types one of the opening characters the closing character will be added to the text after the selection, both without and with selected text:
+Automatically matching opening and closing characters is typically implemented for braces and single and double quotes (`([{` and `'"`). Whenever a user types one of the opening characters the closing character will be added to the text after the selection, both without and with selected text:
 
 ```
 function><
@@ -113,7 +113,7 @@ function><
 
 **`testAutoStrip(pairs, prefix, selected, suffix)`**
 
-Returns `true` if prefix and suffix start with a matching character pair, `false otherwise. Valid character pairs are defined by the pairs parameter, which should be an array containing arrays of valid opening and closing characters. The outer array can also contain single element arrays when a matching pair is formed by identical characters.
+Returns `true` if prefix and suffix start with a matching character pair, `false otherwise. Valid character pairs are defined by the `pairs` parameter, which should be an array containing arrays of valid opening and closing characters. The outer array can also contain single element arrays when a matching pair is formed by identical characters.
 
 The default pairs are defined as
 
@@ -125,7 +125,7 @@ pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]]
 
 **`overwrite(closing, prefix, selected, suffix)`**
 
-If a closing character is typed directly before the identical character, overwrite the character instead of adding a new one.
+If a closing character is typed directly before an identical character, overwrite the character instead of adding a new one.
 
 ```
 function(><)
@@ -172,7 +172,7 @@ Code indentation is used for alignment and maintaining readable code, tab indent
 
 **`tabUnindent(newLine, tab, prefix, selected, suffix)`**
 
-Removes tab-like text based on the selection. If the selection is on a single line and the text before the selection ends with a tab-like, the tab is removed, otherwise the selection will be tab-*indented* instead. If multiple lines are selected, one tab-like will be removed from the start of all lines selected, including the line where the selection starts.
+Removes tab-like characters based on the selection. If the selection is on a single line and the prefix string before the selection ends with a tab-like, the tab is removed, otherwise the selection will be tab-*indented* instead. If multiple lines are selected, one tab-like will be removed from the start of all lines selected, including the line where the selection starts.
 
 
 ```
