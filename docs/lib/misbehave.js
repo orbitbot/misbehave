@@ -1386,9 +1386,10 @@ var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
     }
   } else {
     var prevLength = prevLine.length;
-
-    prevLine = removeIfStartsWith(tab)(prevLine);
-    prefix = prefix.slice(0, -prevLength) + prevLine;
+    if (prevLength) {
+      prevLine = removeIfStartsWith(tab)(prevLine);
+      prefix = prefix.slice(0, -prevLength) + prevLine;
+    }
     lines = lines.map(removeIfStartsWith(tab));
     selected = lines.join(newLine);
   }

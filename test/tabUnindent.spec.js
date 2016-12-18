@@ -25,4 +25,11 @@ describe('tabUnindent', () => {
     selected.should.equal('\nfst\nsnd\n  trd')
     suffix.should.equal('\n]')
   })
+
+  it('#2: Don`t remove content before multiline selection ', () => {
+    ({ prefix, selected, suffix } = string.tabUnindent('\n', '  ', 'asdfas\n\n', 'function() {\n  \n}', ''))
+    prefix.should.equal('asdfas\n\n')
+    selected.should.equal('function() {\n\n}')
+    suffix.should.equal('')
+  })
 })
