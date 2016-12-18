@@ -1268,22 +1268,12 @@ var defineNewLine = function () {
     { return '\n'; }
 };
 
-var nthOccurrance = function (string, character, n) {
-  var count = 0, i = 0;
-  while (count < n && (i = string.indexOf(character, i) + 1)) {
-    count++;
-  }
-  if (count == n) { return i; }
-  return NaN;
-};
-
 exports.allNewLines = allNewLines;
 exports.onNewLine = onNewLine;
 exports.leadingWhitespace = leadingWhitespace;
 exports.allCharacters = allCharacters;
 exports.removeIfStartsWith = removeIfStartsWith;
 exports.defineNewLine = defineNewLine;
-exports.nthOccurrance = nthOccurrance;
 });
 
 
