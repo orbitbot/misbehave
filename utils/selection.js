@@ -39,7 +39,7 @@ export const getSections = (elem, callback) => {
   console.info('extracted', [prefix, selected, suffix])
 
   if (callback)
-    callback({ prefix, selected, suffix }, sel)
+    return callback({ prefix, selected, suffix }, sel)
   else
     return { prefix, selected, suffix }
 }
