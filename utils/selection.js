@@ -36,8 +36,6 @@ export const getSections = (elem, callback) => {
     suffix = tempRange.text
   }
 
-  console.info('extracted', [prefix, selected, suffix])
-
   if (callback)
     return callback({ prefix, selected, suffix }, sel)
   else

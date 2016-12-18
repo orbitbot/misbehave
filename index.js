@@ -3,8 +3,8 @@
 import Combokeys from 'combokeys'
 import UndoManager from 'undo-manager'
 import StrUtil from './utils/string'
-import { withStartEnd, setSelection } from './utils/selection'
-import { defineNewLine, nthOccurrance } from './utils/utils'
+import { getSections, setSelection } from './utils/selection'
+import { defineNewLine } from './utils/utils'
 import store from './utils/store'
 
 
@@ -16,43 +16,30 @@ export default class Misbehave {
                       softTabs = 2,
                       replaceTab = true,
                       pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]],
-                      onchange
+                      oninput = () => {}
                     } = {}) {
 
     let misbehave = this
-    let newLine = defineNewLine()
-    let strUtil = new StrUtil(newLine, softTabs ? ' '.repeat(softTabs) : '\t')
+    let strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t')
 
     let undoMgr = new UndoManager()
     let current = store({ prefix: '', selected: '', suffix: '' })
 
     let setDom = (value) => {
-      elem.textContent = value.prefix + value.selected + value.suffix
-      setSelection(elem, value.prefix.length, value.selected.length)
+      var content = value.prefix + value.selected + value.suffix
+      elem.textContent = content
+      oninput(content, value)
+      setSelection(elem, value.prefix.length, value.prefix.length + value.selected.length)
     }
 
-    let update = (update, updateDom) => {
+    let update = (update) => {
       let previous = current()
       undoMgr.add({
         undo : () => { setDom(previous) },
         redo : () => { setDom(update) }
       })
       current(update)
-      if (onchange) onchange(update.prefix + update.selected + update.suffix)
-      if (updateDom) setDom(update)
-    }
-
-    let extract = (fn) => {
-      return withStartEnd((selection, range, startLine, startOffset, endLine, endOffset) => {
-        let prefixIndex = nthOccurrance(elem.textContent, newLine, startLine) + startOffset
-        let prefix = elem.textContent.slice(0, prefixIndex)
-        let selected = range.toString()
-        let suffix = elem.textContent.slice(prefixIndex + selected.length)
-
-        // console.info('extracted', [prefix, selected, suffix])
-
-        return fn(selection, range, prefix, selected, suffix)
-      })
+      setDom(update)
     }
 
     let keys = new Combokeys(elem)
@@ -62,29 +49,29 @@ export default class Misbehave {
     keys.bind('shift+mod+z', () => { undoMgr.redo(); return false })
 
     if (autoIndent) {
-      keys.bind('enter', extract((selection, range, prefix, selected, suffix) => {
-        update(strUtil.autoIndent(prefix, selected, suffix), true)
+      keys.bind('enter', () => getSections(elem, ({ prefix, selected, suffix}) => {
+        update(strUtil.autoIndent(prefix, selected, suffix))
         return false
       }))
     }
 
     if (autoStrip) {
-      keys.bind('backspace', extract((selection, range, prefix, selected, suffix) => {
+      keys.bind('backspace', () => getSections(elem, ({ prefix, selected, suffix }, selection) => {
         if (selection.isCollapsed && strUtil.testAutoStrip(pairs, prefix, selected, suffix)) {
-          update(strUtil.autoStrip(prefix, selected, suffix), true)
+          update(strUtil.autoStrip(prefix, selected, suffix))
           return false
         }
       }))
     }
 
-    let fnAutoOpen = (opening, closing) => extract((selection, range, prefix, selected, suffix) => {
-      update(strUtil.autoOpen(opening, closing, prefix, selected, suffix), true)
+    const fnAutoOpen = (opening, closing) => () => getSections(elem, ({ prefix, selected, suffix }) => {
+      update(strUtil.autoOpen(opening, closing, prefix, selected, suffix))
       return false
     })
 
-    let fnOverwrite = (closing) => extract((selection, range, prefix, selected, suffix) => {
+    const fnOverwrite = (closing) => () => getSections(elem, ({ prefix, selected, suffix }, selection) => {
       if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
-        update(strUtil.overwrite(closing, prefix, selected, suffix), true)
+        update(strUtil.overwrite(closing, prefix, selected, suffix))
         return false
       }
     })
@@ -95,11 +82,11 @@ export default class Misbehave {
         if (overwrite) keys.bind(closing, fnOverwrite(closing))
       } else {
         if (autoOpen && overwrite) {
-          keys.bind(opening, extract((selection, range, prefix, selected, suffix) => {
+          keys.bind(opening, () => getSections(elem, ({ prefix, selected, suffix }, selection) => {
             if (selection.isCollapsed && strUtil.testOverwrite(opening, prefix, selected, suffix))
-              update(strUtil.overwrite(opening, prefix, selected, suffix), true)
+              update(strUtil.overwrite(opening, prefix, selected, suffix))
             else
-              update(strUtil.autoOpen(opening, opening, prefix, selected, suffix), true)
+              update(strUtil.autoOpen(opening, opening, prefix, selected, suffix))
             return false
           }))
         } else {
@@ -110,22 +97,20 @@ export default class Misbehave {
     })
 
     if (replaceTab) {
-      keys.bind('tab', extract((selection, range, prefix, selected, suffix) => {
-        update(strUtil.tabIndent(prefix, selected, suffix), true)
+      keys.bind('tab', () => getSections(elem, ({ prefix, selected, suffix }) => {
+        update(strUtil.tabIndent(prefix, selected, suffix))
         return false
       }))
 
-      keys.bind('shift+tab', extract((selection, range, prefix, selected, suffix) => {
-        update(strUtil.tabUnindent(prefix, selected, suffix), true)
+      keys.bind('shift+tab', () => getSections(elem, ({ prefix, selected, suffix }) => {
+        update(strUtil.tabUnindent(prefix, selected, suffix))
         return false
       }))
     }
 
-    let inputListener = elem.addEventListener('input', extract((selection, range, prefix, selected, suffix) => {
-      update({ prefix, selected, suffix })
-    }))
+    misbehave.__inputListener = elem.addEventListener('input', () => getSections(elem, update))
 
-    if (onchange) onchange(elem.textContent)
+    oninput(elem.textContent)
 
     // expose for haxxoers
     misbehave.__elem = elem
@@ -134,8 +119,6 @@ export default class Misbehave {
     misbehave.__current = current
     misbehave.__setDom = setDom
     misbehave.__update = update
-    misbehave.__extract = extract
-    misbehave.__inputListener = inputListener
     misbehave.__keys = keys
   }
 
