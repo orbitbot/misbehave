@@ -6,7 +6,7 @@
 `misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the utils README](utils/README.md) for details. The indentation behaviour for `misbehave` is currently hardcoded for javascript code entry, and may not perform to expectations if used for other languages.
 
 - [Live demo on GH pages](https://orbitbot.github.io/misbehave/)
-- Experimental [live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
+- [Live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
 
 <br>
 
