@@ -1,6 +1,6 @@
 {
   "name": "misbehave",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Add IDE-like text entry to HTML contenteditable tags",
   "main": "misbehave.js",
   "scripts": {
@@ -9,8 +9,12 @@
   },
   "keywords": [
     "contenteditable",
+    "editor",
+    "editor-ish",
+    "formatting",
     "IDE",
-    "formatting"
+    "js",
+    "vanilla"
   ],
   "author": "Patrik Johnson <patrik@zebros.fi>",
   "license": "MIT",
