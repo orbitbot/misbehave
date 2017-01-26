@@ -1,29 +1,20 @@
 'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+export const allNewLines = /\r\n|\r|\n/g
 
-let allNewLines = /\r\n|\r|\n/g
+export const onNewLine = /\r\n|\r|\n/
 
-let onNewLine = /\r\n|\r|\n/
+export const leadingWhitespace = /^\s*/
 
-let leadingWhitespace = /^\s*/
+export const allCharacters = /./g
 
-let allCharacters = /./g
+export const removeIfStartsWith = (s) => (line) => line.startsWith(s) ? line.slice(s.length) : line
 
-let removeIfStartsWith = (s) => (line) => { return line.startsWith(s) ? line.slice(s.length) : line }
-
-let defineNewLine = () => {
+export const defineNewLine = () => {
   let ta = document.createElement('textarea')
   ta.value = '\n'
   if (ta.value.length === 2)
-    return '\r\n';
+    return '\r\n'
   else
-    return '\n';
+    return '\n'
 }
-
-exports.allNewLines = allNewLines;
-exports.onNewLine = onNewLine;
-exports.leadingWhitespace = leadingWhitespace;
-exports.allCharacters = allCharacters;
-exports.removeIfStartsWith = removeIfStartsWith;
-exports.defineNewLine = defineNewLine;

@@ -1,4 +1,4 @@
-"use strict"
+'use strict';
 
 export const getSections = (elem, callback) => {
   var sel, range, tempRange, prefix = '', selected = '', suffix = ''

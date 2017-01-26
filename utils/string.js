@@ -1,16 +1,15 @@
-"use strict"
+'use strict';
 
-Object.defineProperty(exports, '__esModule', { value: true });
+import {
+  leadingWhitespace,
+  removeIfStartsWith,
+  onNewLine,
+  allNewLines,
+  allCharacters
+} from './utils'
 
-let utils = require('./utils')
-let leadingWhitespace = utils.leadingWhitespace
-let removeIfStartsWith = utils.removeIfStartsWith
-let onNewLine = utils.onNewLine
-let allNewLines = utils.allNewLines
-let allCharacters = utils.allCharacters
 
-
-let autoIndent = (newLine, tab, prefix, selected, suffix) => {
+export const autoIndent = (newLine, tab, prefix, selected, suffix) => {
   let prevLine = prefix.split(onNewLine).splice(-1)[0]
   let prefEnd = prefix.slice(-1)
   let suffStart = suffix.charAt(0)
@@ -30,20 +29,20 @@ let autoIndent = (newLine, tab, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-let autoOpen = (opening, closing, prefix, selected, suffix) => {
+export const autoOpen = (opening, closing, prefix, selected, suffix) => {
   prefix += opening
   suffix = closing + suffix
   return { prefix, selected, suffix }
 }
 
-let autoStrip = (prefix, selected, suffix) => {
+export const autoStrip = (prefix, selected, suffix) => {
   prefix = prefix.slice(0, -1)
   suffix = suffix.slice(1)
   return { prefix, selected, suffix }
 }
 
 // content in selection is handled in index.js
-let testAutoStrip = (pairs, prefix, selected, suffix) => {
+export const testAutoStrip = (pairs, prefix, selected, suffix) => {
   let result = false
   pairs.forEach(([opening, closing]) => {
     closing = closing ? closing : opening
@@ -52,18 +51,18 @@ let testAutoStrip = (pairs, prefix, selected, suffix) => {
   return result
 }
 
-let overwrite = (closing, prefix, selected, suffix) => {
+export const overwrite = (closing, prefix, selected, suffix) => {
   prefix += closing
   suffix = suffix.slice(1)
   return { prefix, selected, suffix }
 }
 
 // content in selection is handled in index.js
-let testOverwrite = (closing, prefix, selected, suffix) => {
+export const testOverwrite = (closing, prefix, selected, suffix) => {
   return suffix.charAt(0) === closing
 }
 
-let tabIndent = (newLine, tab, prefix, selected, suffix) => {
+export const tabIndent = (newLine, tab, prefix, selected, suffix) => {
   let prefLines = prefix.split(onNewLine)
   let prevLine = prefLines.splice(-1)[0]
 
@@ -81,7 +80,7 @@ let tabIndent = (newLine, tab, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
+export const tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   let lines = selected.split(onNewLine)
   let prevLine = prefix.split(onNewLine).splice(-1)[0]
 
@@ -107,7 +106,7 @@ let tabUnindent = (newLine, tab, prefix, selected, suffix) => {
   return { prefix, selected, suffix }
 }
 
-function StrUtil(newLine, tab) {
+export default function StrUtil(newLine, tab) {
   return {
     autoIndent    : (...args) => autoIndent(newLine, tab, ...args),
     autoOpen      : autoOpen,
@@ -119,13 +118,3 @@ function StrUtil(newLine, tab) {
     tabUnindent   : (...args) => tabUnindent(newLine, tab, ...args)
   }
 }
-
-exports.autoIndent = autoIndent;
-exports.autoOpen = autoOpen;
-exports.autoStrip = autoStrip;
-exports.testAutoStrip = testAutoStrip;
-exports.overwrite = overwrite;
-exports.testOverwrite = testOverwrite;
-exports.tabIndent = tabIndent;
-exports.tabUnindent = tabUnindent;
-exports['default'] = StrUtil;

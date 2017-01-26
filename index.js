@@ -1,4 +1,4 @@
-"use strict"
+'use strict';
 
 import Combokeys from 'combokeys'
 import UndoManager from 'undo-manager'
@@ -19,20 +19,20 @@ export default class Misbehave {
                       oninput = () => {}
                     } = {}) {
 
-    let misbehave = this
-    let strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t')
+    const misbehave = this
+    const strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t')
 
-    let undoMgr = new UndoManager()
-    let current = store({ prefix: '', selected: '', suffix: '' })
+    const undoMgr = new UndoManager()
+    const current = store({ prefix: '', selected: '', suffix: '' })
 
-    let setDom = (value) => {
+    const setDom = (value) => {
       var content = value.prefix + value.selected + value.suffix
       elem.textContent = content
       oninput(content, value)
       setSelection(elem, value.prefix.length, value.prefix.length + value.selected.length)
     }
 
-    let update = (update) => {
+    const update = (update) => {
       let previous = current()
       undoMgr.add({
         undo : () => { setDom(previous) },
@@ -42,7 +42,7 @@ export default class Misbehave {
       setDom(update)
     }
 
-    let keys = new Combokeys(elem)
+    const keys = new Combokeys(elem)
     keys.stopCallback = () => false // work without needing to set combokeys class on elements
 
     keys.bind('mod+z', () => { undoMgr.undo(); return false })

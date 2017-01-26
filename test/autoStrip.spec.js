@@ -1,5 +1,5 @@
-let chai = require('chai');
-let should = chai.should();
+let chai = require('chai')
+let should = chai.should()
 
 let string = require('../utils/string')
 
