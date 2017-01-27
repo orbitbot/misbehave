@@ -41,6 +41,14 @@ Misbehave has not gone through exhaustive testing, so buyer beware. `#worksforme
 
 <br>
 
+### Roadmap
+
+- configurable undo limit (pass param in constructor)
+- configurable string utils -> language implementations
+  ->
+- configurable store (?)
+-
+
 ### License
 
 `misbehave` is MIT licensed.

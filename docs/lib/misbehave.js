@@ -43,7 +43,7 @@ var trigger = function (keys, action) {
 };
 
 /* eslint-env node, browser */
-var reset$1 = function () {
+var reset = function () {
   var self = this;
   self.callbacks = {};
   self.directMap = {};
@@ -760,7 +760,7 @@ var detach = function () {
 };
 
 /* eslint-env node, browser */
-var reset$3 = function () {
+var reset$2 = function () {
   var self = this;
 
   self.instances.forEach(function (combokeys) {
@@ -839,7 +839,7 @@ module.exports.prototype.bind = bind;
 module.exports.prototype.bindMultiple = bindMultiple;
 module.exports.prototype.unbind = unbind;
 module.exports.prototype.trigger = trigger;
-module.exports.prototype.reset = reset$1;
+module.exports.prototype.reset = reset;
 module.exports.prototype.stopCallback = stopCallback;
 module.exports.prototype.handleKey = handleKey;
 module.exports.prototype.addEvents = addEvents;
@@ -855,7 +855,7 @@ module.exports.prototype.resetSequenceTimer = resetSequenceTimer;
 module.exports.prototype.detach = detach;
 
 module.exports.instances = [];
-module.exports.reset = reset$3;
+module.exports.reset = reset$2;
 
 /**
  * variable to store the flipped version of MAP from above
@@ -1015,7 +1015,7 @@ https://github.com/ArthurClemens/Javascript-Undo-Manager
 		undefined(function() {
 			return UndoManager;
 		});
-	} else if (typeof module !== 'undefined' && module.exports) {
+	} else if ('object' !== 'undefined' && module.exports) {
 		module.exports = UndoManager;
 	} else {
 		window.UndoManager = UndoManager;
