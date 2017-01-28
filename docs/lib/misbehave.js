@@ -1280,13 +1280,15 @@ var Misbehave = function Misbehave(elem, ref) {
   var replaceTab = ref.replaceTab; if ( replaceTab === void 0 ) replaceTab = true;
   var pairs = ref.pairs; if ( pairs === void 0 ) pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]];
   var oninput = ref.oninput; if ( oninput === void 0 ) oninput = function () {};
+  var undoLimit = ref.undoLimit; if ( undoLimit === void 0 ) undoLimit = 0;
 
 
   var misbehave = this;
   var strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t');
+  var current = store({ prefix: '', selected: '', suffix: '' });
 
   var undoMgr = new undomanager();
-  var current = store({ prefix: '', selected: '', suffix: '' });
+  undoMgr.setLimit(undoLimit);
 
   var setDom = function (value) {
     var content = value.prefix + value.selected + value.suffix;
@@ -1295,14 +1297,14 @@ var Misbehave = function Misbehave(elem, ref) {
     setSelection(elem, value.prefix.length, value.prefix.length + value.selected.length);
   };
 
-  var update = function (update) {
+  var update = function (content) {
     var previous = current();
     undoMgr.add({
       undo : function () { setDom(previous); },
-      redo : function () { setDom(update); }
+      redo : function () { setDom(content); }
     });
-    current(update);
-    setDom(update);
+    current(content);
+    setDom(content);
   };
 
   var keys = new index(elem);

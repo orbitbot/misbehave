@@ -16,14 +16,16 @@ export default class Misbehave {
                       softTabs = 2,
                       replaceTab = true,
                       pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]],
-                      oninput = () => {}
+                      oninput = () => {},
+                      undoLimit = 0
                     } = {}) {
 
     const misbehave = this
     const strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t')
+    const current = store({ prefix: '', selected: '', suffix: '' })
 
     const undoMgr = new UndoManager()
-    const current = store({ prefix: '', selected: '', suffix: '' })
+    undoMgr.setLimit(undoLimit)
 
     const setDom = (value) => {
       var content = value.prefix + value.selected + value.suffix
@@ -32,14 +34,14 @@ export default class Misbehave {
       setSelection(elem, value.prefix.length, value.prefix.length + value.selected.length)
     }
 
-    const update = (update) => {
+    const update = (content) => {
       let previous = current()
       undoMgr.add({
         undo : () => { setDom(previous) },
-        redo : () => { setDom(update) }
+        redo : () => { setDom(content) }
       })
-      current(update)
-      setDom(update)
+      current(content)
+      setDom(content)
     }
 
     const keys = new Combokeys(elem)

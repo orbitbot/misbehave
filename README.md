@@ -10,13 +10,16 @@
 
 <br>
 
-**Experimental**
+**Experimental-ish**
 
-Misbehave has not gone through exhaustive testing, so buyer beware. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
+Misbehave has not gone through exhaustive send-this-ship-to-the-moon production level testing, more sort of manually by amenable code-monkeys. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
 
 <br>
 
 ### Features
+
+
+###### Comparison with behave.js
 
 | feature    | description                                                                                        | misbehave             | behave.js                              |
 |:-----------|:---------------------------------------------------------------------------------------------------|:---------------------:|:--------------------------------------:|
@@ -29,26 +32,44 @@ Misbehave has not gone through exhaustive testing, so buyer beware. `#worksforme
 | softTabs   | use spaces instead of tab characters                                                               | `Y`                   | `Y`                                    |
 | code fence | exclude areas from editing functionality with magic string                                         | `N/A`                 | `Y`                                    |
 
-- `misbehave`'s undo/redo is a naive implementation where each input is individually undoable and doesn't handle restoring selection perfectly. Undo history is also unlimited, which therefore might cause memory issues over time
+- `misbehave`'s undo/redo is a naive implementation where each input is individually undoable and doesn't handle restoring selection perfectly. By default, undo/redo history is also unlimited, which therefore might cause memory issues over time in constrained environments
 - `misbehave` works on `contenteditable` HTML tags, whereas `behave.js` is implemented for textareas
 
 <br>
+### Installation
 
-<!-- installation -->
+Right click to save or use the URLs in your script tags
+
+- [`misbehave.js`](https://rawgit.com/orbitbot/misbehave/master/misbehave.js)
+
+or use
+
+```sh
+$ npm install pastafarian
+```
+
+The URL provided above is a "development" URL from RawGit, you should switch to the "production" URL to ensure that you're getting a known version and don't have issues with traffic limits or throttling if using `misbehave` like this on a more permanent basis.
+
+If you're using `misbehave` directly in a browser environment without a packaging toolchain, the constructor is attached to the `Misbehave` global.
+
 <!-- Usage -->
 <!-- ... oninput -->
-<!-- Usage with Prism.js -->
 
 <br>
+### Usage with Prism.js
 
-### Roadmap
+[Prism.js](http://prismjs.com/) is a syntax highlighter for webpages that can be configured to work with `misbehave`. Prism.js CSS [enforces using `<code>` elements for syntax highlighting](http://prismjs.com/#features-full), which you probably want to place inside `<pre>` elements if you are going to use `misbehave`. Configure Prism.js to highlight the code in `misbehave`'s `oninput` callback:
 
-- configurable undo limit (pass param in constructor)
-- configurable string utils -> language implementations
-  ->
-- configurable store (?)
--
+```js
+var code = document.querySelector('#code')
+var misbehave = new Misbehave(code, {
+  oninput : () => Prism.highlightElement(code)
+})
+```
 
+An example with the Okaida theme is [available on GH pages](https://orbitbot.github.io/misbehave/prismjs.html), the source code is in the `docs/` folder.
+
+<br>
 ### License
 
 `misbehave` is MIT licensed.
