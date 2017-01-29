@@ -2,7 +2,7 @@
 
 `misbehave` considers only the plain text of the html tags that it works on, and works based on the idea of the text content split into three parts; `prefix`, `selected` and `suffix`. `selected` is taken to mean the current location of the cursor or whatever part of the text the user has highlighted, with `prefix` and `suffix` being the rest of the text before and after this selection, respectively. With this abstraction, the implementation of common IDE text entry functionality is relatively straightforward. For example, bracket auto open is the simple operation of adding opening and closing bracket characters to the prefix and suffix without changing the selection.
 
-Because of the above, the implementations in `misbehave` can be re-used elsewhere you require similar functionality in javascript. The rest of this README outlines the functionality of the provided methods with some examples.
+Because of the above, the implementations in `misbehave` can be re-used elsewhere you require similar functionality. The rest of this README outlines the functionality of the provided methods with some examples using the default javascript IDE-like _behavior_. The functionality discussed is implemented in the `behaviors/javascript/index.js` file in this repository.
 
 In the following examples, the characters `>` and `<` are used to indicate the start and end of the selected text, if any, and do not themselves actually count as characters. As an example, in the case of `"demonstration><"` the cursor is directly after the full word with no text highlighted, and with `"plato >units <of bitterness"` the substring `units ` (including the space after the word) is selected. Consequently,
 

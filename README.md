@@ -3,7 +3,7 @@
 
 `misbehave` is a small library for adding IDE-like text entry to HTML `contenteditable` tags, inspired by [behave.js](https://github.com/iamso/Behave.js). When you need something, but [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) seem large (they're probably more robust, so pick your poison).
 
-`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the utils README](utils/README.md) for details. The indentation behaviour for `misbehave` is currently hardcoded for javascript code entry, and may not perform to expectations if used for other languages.
+`misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way. Text entry _"behavior"_ is configurable in `misbehave`, the default build supports javascript text entry based on functionality from Sublime Text 3. [Check the behaviors README](behaviors/README.md) for details and the subfolders under `behaviors/` for implementations.
 
 <br>
 
