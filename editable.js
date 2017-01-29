@@ -111,7 +111,7 @@ export default class Editable {
 
     editable.__inputListener = elem.addEventListener('input', () => getSections(elem, update))
 
-    setDom(store())
+    oninput(elem.textContent, store())
 
     // expose for haxxoers
     editable.__elem = elem
@@ -123,9 +123,17 @@ export default class Editable {
     editable.__keys = keys
   }
 
-  destroy () {
+  destroy() {
     this.__elem.removeEventListener('input', this.__inputListener)
     this.__keys.detach()
     this.__undoMgr.clear()
+  }
+
+  focus() {
+    this.__elem.focus()
+  }
+
+  blur() {
+    this.__elem.blur()
   }
 }

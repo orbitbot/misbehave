@@ -3,7 +3,9 @@
 export const getSections = (elem, callback) => {
   var sel, range, tempRange, prefix = '', selected = '', suffix = ''
 
-  if (typeof window.getSelection !== 'undefined') {
+  if (document.activeElement !== elem) {
+    suffix = elem.textContent
+  } else if (typeof window.getSelection !== 'undefined') {
     sel = window.getSelection()
     selected = sel.toString()
     if (sel.rangeCount) {

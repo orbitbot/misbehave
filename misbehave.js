@@ -161,6 +161,97 @@ function store(value) {
   return gettersetter
 }
 
+var getSections = function (elem, callback) {
+  var sel, range, tempRange, prefix = '', selected = '', suffix = '';
+
+  if (document.activeElement !== elem) {
+    suffix = elem.textContent;
+  } else if (typeof window.getSelection !== 'undefined') {
+    sel = window.getSelection();
+    selected = sel.toString();
+    if (sel.rangeCount) {
+      range = sel.getRangeAt(0);
+    } else {
+      range = document.createRange();
+      range.collapse(true);
+    }
+    tempRange = document.createRange();
+    tempRange.selectNodeContents(elem);
+    tempRange.setEnd(range.startContainer, range.startOffset);
+    prefix = tempRange.toString();
+
+    tempRange.selectNodeContents(elem);
+    tempRange.setStart(range.endContainer, range.endOffset);
+    suffix = tempRange.toString();
+
+    tempRange.detach();
+  } else if ( (sel = document.selection) && sel.type != 'Control') {
+    range = sel.createRange();
+    tempRange = document.body.createTextRange();
+    selected = tempRange.text;
+
+    tempRange.moveToElementText(elem);
+    tempRange.setEndPoint('EndToStart', range);
+    prefix = tempRange.text;
+
+    tempRange.moveToElementText(elem);
+    tempRange.setEndPoint('StartToEnd', range);
+    suffix = tempRange.text;
+  }
+
+  if (callback)
+    { return callback({ prefix: prefix, selected: selected, suffix: suffix }, sel) }
+  else
+    { return { prefix: prefix, selected: selected, suffix: suffix } }
+};
+
+var getTextNodesIn = function (node) {
+  var textNodes = [];
+  if (node.nodeType == 3) {
+    textNodes.push(node);
+  } else {
+    var children = node.childNodes;
+    for (var i = 0, len = children.length; i < len; ++i) {
+      textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
+    }
+  }
+  return textNodes
+};
+
+var setSelection = function (elem, start, end) {
+  if (document.createRange && window.getSelection) {
+    var range = document.createRange();
+    range.selectNodeContents(elem);
+    var textNodes = getTextNodesIn(elem);
+    var foundStart = false;
+    var charCount = 0, endCharCount;
+
+    for (var i = 0, textNode; textNode = textNodes[i++]; ) {
+      endCharCount = charCount + textNode.length;
+      if (!foundStart && start >= charCount && (start < endCharCount || (start == endCharCount && i <= textNodes.length))) {
+        range.setStart(textNode, start - charCount);
+        foundStart = true;
+      }
+      if (foundStart && end <= endCharCount) {
+        range.setEnd(textNode, end - charCount);
+        break
+      }
+      charCount = endCharCount;
+    }
+
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if (document.selection && document.body.createTextRange) {
+    var textRange = document.body.createTextRange();
+    textRange.moveToElementText(elem);
+    textRange.collapse(true);
+    textRange.moveEnd('character', end);
+    textRange.moveStart('character', start);
+    textRange.select();
+  }
+};
+
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -1181,95 +1272,6 @@ https://github.com/ArthurClemens/Javascript-Undo-Manager
 }());
 });
 
-var getSections = function (elem, callback) {
-  var sel, range, tempRange, prefix = '', selected = '', suffix = '';
-
-  if (typeof window.getSelection !== 'undefined') {
-    sel = window.getSelection();
-    selected = sel.toString();
-    if (sel.rangeCount) {
-      range = sel.getRangeAt(0);
-    } else {
-      range = document.createRange();
-      range.collapse(true);
-    }
-    tempRange = document.createRange();
-    tempRange.selectNodeContents(elem);
-    tempRange.setEnd(range.startContainer, range.startOffset);
-    prefix = tempRange.toString();
-
-    tempRange.selectNodeContents(elem);
-    tempRange.setStart(range.endContainer, range.endOffset);
-    suffix = tempRange.toString();
-
-    tempRange.detach();
-  } else if ( (sel = document.selection) && sel.type != 'Control') {
-    range = sel.createRange();
-    tempRange = document.body.createTextRange();
-    selected = tempRange.text;
-
-    tempRange.moveToElementText(elem);
-    tempRange.setEndPoint('EndToStart', range);
-    prefix = tempRange.text;
-
-    tempRange.moveToElementText(elem);
-    tempRange.setEndPoint('StartToEnd', range);
-    suffix = tempRange.text;
-  }
-
-  if (callback)
-    { return callback({ prefix: prefix, selected: selected, suffix: suffix }, sel) }
-  else
-    { return { prefix: prefix, selected: selected, suffix: suffix } }
-};
-
-var getTextNodesIn = function (node) {
-  var textNodes = [];
-  if (node.nodeType == 3) {
-    textNodes.push(node);
-  } else {
-    var children = node.childNodes;
-    for (var i = 0, len = children.length; i < len; ++i) {
-      textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
-    }
-  }
-  return textNodes
-};
-
-var setSelection = function (elem, start, end) {
-  if (document.createRange && window.getSelection) {
-    var range = document.createRange();
-    range.selectNodeContents(elem);
-    var textNodes = getTextNodesIn(elem);
-    var foundStart = false;
-    var charCount = 0, endCharCount;
-
-    for (var i = 0, textNode; textNode = textNodes[i++]; ) {
-      endCharCount = charCount + textNode.length;
-      if (!foundStart && start >= charCount && (start < endCharCount || (start == endCharCount && i <= textNodes.length))) {
-        range.setStart(textNode, start - charCount);
-        foundStart = true;
-      }
-      if (foundStart && end <= endCharCount) {
-        range.setEnd(textNode, end - charCount);
-        break
-      }
-      charCount = endCharCount;
-    }
-
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else if (document.selection && document.body.createTextRange) {
-    var textRange = document.body.createTextRange();
-    textRange.moveToElementText(elem);
-    textRange.collapse(true);
-    textRange.moveEnd('character', end);
-    textRange.moveStart('character', start);
-    textRange.select();
-  }
-};
-
 var Editable = function Editable(elem, ref) {
   if ( ref === void 0 ) ref = {};
   var autoIndent = ref.autoIndent; if ( autoIndent === void 0 ) autoIndent = true;
@@ -1407,7 +1409,7 @@ var Editable = function Editable(elem, ref) {
 
   editable.__inputListener = elem.addEventListener('input', function () { return getSections(elem, update); });
 
-  setDom(store());
+  oninput(elem.textContent, store());
 
   // expose for haxxoers
   editable.__elem = elem;
@@ -1425,11 +1427,19 @@ Editable.prototype.destroy = function destroy () {
   this.__undoMgr.clear();
 };
 
+Editable.prototype.focus = function focus () {
+  this.__elem.focus();
+};
+
+Editable.prototype.blur = function blur () {
+  this.__elem.blur();
+};
+
 var Misbehave = (function (Editable$$1) {
   function Misbehave(elem, opts) {
     if ( opts === void 0 ) opts = {};
 
-    if (typeof opts.store === 'undefined') { opts.store = store({ prefix: '', selected: '', suffix: '' }); }
+    if (typeof opts.store === 'undefined') { opts.store = store(getSections(elem)); }
     if (typeof opts.StrUtil === 'undefined') { opts.StrUtil = StrUtil; }
 
     Editable$$1.call(this, elem, opts);
