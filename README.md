@@ -88,42 +88,6 @@ For the purpose of this section, let's assign the variable `misbehave` the resul
 
 Provide a `contenteditable` DOM node to the constructor as in [the Usage example]() above. Options, their meaning and the defaults are show in [Options and defaults]().
 
-<br>
-##### Fields
-
-These fields are mainly used internally and are exposed to potentially enable advanced use patterns if required.
-
-**`misbehave.elem : DOM node`**
-
-A reference to the DOM element passed in the constructor.
-
-**`misbehave.handler : function`**
-
-The [_behavior_](behaviors/README.md) definition used to enable the custom text entry functionality.
-
-**`misbehave.inputListener : function`**
-
-An event handler attached to the `input` DOM event of `misbehave.elem`, used to keep the instance in sync with the content when none of the special keys are pressed and for cleanup.
-
-**`misbehave.keys : module`**
-
-The [Combokeys](https://github.com/avocode/combokeys) instance used to provide key bindings for `misbehave`.
-
-**`misbehave.store : function`**
-
-Used to store a reference to the current content and selection for `misbehave.elem`.
-
-**`misbehave.setDom : function`**
-
-Used internally to set the `textContent` and [Selection](https://developer.mozilla.org/en-US/docs/Web/API/Selection) of `misbehave.element`.
-
-**`misbehave.undoMgr : module`**
-
-The [Undo Manager](https://github.com/ArthurClemens/Javascript-Undo-Manager) used to provide undo / redo functionality.
-
-**`misbehave.update : function`**
-
-Used internally to add undo / redo actions, update the store and set the DOM as the end user edits text content.
 
 <br>
 ##### Methods
@@ -145,6 +109,22 @@ Convenience method to call blur on `misbehave.elem`.
 <!-- ... oninput -->
 
 The CSS [`tab-size` property](https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size) can be used to set the desired tab width if the `softTabs` option is set to `false`.
+
+<br>
+##### Fields
+
+These fields are mainly used internally and are exposed to potentially enable advanced use patterns if required.
+
+| field                         | type     | description                                                                                                                                 |
+|:------------------------------|:---------|:--------------------------------------------------------------------------------------------------------------------------------------------|
+| **`misbehave.elem`**          | DOM node | A reference to the DOM element passed in the constructor                                                                                    |
+| **`misbehave.handler`**       | function | The [_behavior_](behaviors/README.md) definition used to enable the custom text entry functionality                                         |
+| **`misbehave.inputListener`** | function | An event handler attached to the `input` DOM event of `misbehave.elem`, used to keep the instance in sync with the content and for cleanup  |
+| **`misbehave.keys`**          | module   | The [Combokeys](https://github.com/avocode/combokeys) instance used to provide key bindings for `misbehave`                                 |
+| **`misbehave.store`**         | function | Used to store a reference to the current content and selection for `misbehave.elem`                                                         |
+| **`misbehave.setDom`**        | function | Used internally to set the `textContent` and [Selection](https://developer.mozilla.org/en-US/docs/Web/API/Selection) of `misbehave.element` |
+| **`misbehave.undoMgr`**       | module   | The [Undo Manager](https://github.com/ArthurClemens/Javascript-Undo-Manager) used to provide undo / redo functionality                      |
+| **`misbehave.update`**        | function | Used internally to add undo / redo actions, update the store and set the DOM as the end user edits text content                             |
 
 <br>
 ### Usage with Prism.js
