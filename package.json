@@ -1,6 +1,6 @@
 {
   "name": "misbehave",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Add IDE-like text entry to HTML contenteditable tags",
   "main": "misbehave.js",
   "scripts": {
