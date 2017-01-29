@@ -1407,32 +1407,32 @@ var Editable = function Editable(elem, ref) {
     }); });
   }
 
-  editable.__inputListener = elem.addEventListener('input', function () { return getSections(elem, update); });
+  editable.inputListener = elem.addEventListener('input', function () { return getSections(elem, update); });
 
   oninput(elem.textContent, store());
 
   // expose for haxxoers
-  editable.__elem = elem;
-  editable.__strUtil = strUtil;
-  editable.__undoMgr = undoMgr;
-  editable.__store = store;
-  editable.__setDom = setDom;
-  editable.__update = update;
-  editable.__keys = keys;
+  editable.elem = elem;
+  editable.strUtil = strUtil;
+  editable.undoMgr = undoMgr;
+  editable.store = store;
+  editable.setDom = setDom;
+  editable.update = update;
+  editable.keys = keys;
 };
 
 Editable.prototype.destroy = function destroy () {
-  this.__elem.removeEventListener('input', this.__inputListener);
-  this.__keys.detach();
-  this.__undoMgr.clear();
+  this.elem.removeEventListener('input', this.inputListener);
+  this.keys.detach();
+  this.undoMgr.clear();
 };
 
 Editable.prototype.focus = function focus () {
-  this.__elem.focus();
+  this.elem.focus();
 };
 
 Editable.prototype.blur = function blur () {
-  this.__elem.blur();
+  this.elem.blur();
 };
 
 var Misbehave = (function (Editable$$1) {
