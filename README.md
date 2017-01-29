@@ -75,7 +75,7 @@ The library exposes a `Misbehave` module or browser global, which is a construct
 let editoresque = new Misbehave(document.querySelector('#code'))
 ```
 
-`misbehave` will then process text entered into the `<code>` block only. The other attributes specified in HTML are there to remove default browser functionality that may be distracting when entering source code instead of regular text.
+`misbehave` will then process text entered into the `<code>` element only. The other attributes specified in HTML are there to remove default browser functionality that may be distracting when entering source code instead of regular text.
 
 <br>
 ### API
@@ -106,9 +106,41 @@ Convenience method to call blur on `misbehave.elem`.
 
 <br>
 ##### Options and defaults
-<!-- ... oninput -->
 
-The CSS [`tab-size` property](https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size) can be used to set the desired tab width if the `softTabs` option is set to `false`.
+The second parameter to the `Misbehave` constructor is a configurations object, which is optional. The possible fields and their defaults are
+
+```
+{ autoIndent = true,
+  autoOpen   = true,
+  autoStrip  = true,
+  overwrite  = true,
+  softTabs   = 2,
+  replaceTab = true,
+  pairs      = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]],
+  oninput    = () => {},
+  undoLimit  = 0,
+  behavior   = 'behaviors/javascript/index.js',
+  store      = 'utils/store.js',
+}
+```
+
+The functionality of `autoIndent`, `autoOpen`, `autoStrip`, `overwrite`, `softTabs` and `replaceTab` are as described in [Comparison with behave.js](). The CSS [`tab-size` property](https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size) can be used to set the desired tab width if the `softTabs` option is set to `false`.
+
+**`pairs`** is an array containing nested arrays of `[<opening>, <closing>]` character pairs that the `autoOpen`, `autoStrip` and `overwrite` options apply to. If a "pair" consists of identical characters, such as quotation marks `"`, a single element passed is sufficient. As an example, if you would like to define `*`, and `<` and `>` as special characters, pass `[['<', '>'], ['*']]` as the `pairs` option.
+
+**`oninput`** is a callback fired whenever there the user changes edits content in `misbehave.elem`. The signature is
+
+```js
+const onInput = (textContent, { prefix, selected, suffix }) => { /* ... */ }
+```
+
+The return value of `oninput` is ignored. The second parameter is a reference to the internal variable used by `misbehave` and should be considered read-only to avoid unwanted side effects.
+
+**`undoLimit`** is passed directly to [Undo Manager](https://github.com/ArthurClemens/Javascript-Undo-Manager) and sets the number of undo / redo steps that are maintained by `misbehave`. Note that each keystroke is individually undoable, so especially low limits should probably be avoided. The default is 0, which means unlimited history.
+
+**`behavior`** is explained [the behaviors README](behaviors/README.md), and is the way to f.e. configure Python text entry functionality for `misbehave`.
+
+**`store`** is discussed in [Store API]().
 
 <br>
 ##### Fields
