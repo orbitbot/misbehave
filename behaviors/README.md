@@ -14,8 +14,20 @@ var json = >{
 
 indicates the multi-line selection of the whole JSON object inside the angle brackets.
 
-<br>
+### Factory method
 
+A _behavior_  implementation should be a function that returns an object with all the methods defined in the next section (API). The function signature is
+
+```javascript
+const behavior = (newline, tablike) => {
+  autoIndent : () => { /* ... */},
+  ...
+}
+```
+
+Where `newline` and `tablike` are the appropriate characters or strings defined by the platform and configuration, which should be used as such to implement correct indentation.
+
+<br>
 ### API
 
 All of the below methods return an object `{ prefix, selected, suffix }`, which represent the parameters modified with the corresponding action. `tab` indicates the tab string to use (eg. `\t` or `"  "` for soft tabs with two spaces), whereas `newLine` should be the newline character(s) to use depending on the target platform (`\n` or `\r\n`).
