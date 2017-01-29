@@ -5,9 +5,6 @@
 
 `misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way in javascript. [Check the utils README](utils/README.md) for details. The indentation behaviour for `misbehave` is currently hardcoded for javascript code entry, and may not perform to expectations if used for other languages.
 
-- [Live demo on GH pages](https://orbitbot.github.io/misbehave/)
-- [Live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
-
 <br>
 
 **Experimental-ish**
@@ -15,11 +12,16 @@
 Misbehave has not gone through exhaustive send-this-ship-to-the-moon production level testing, more sort of manually by amenable code-monkeys. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
 
 <br>
+### Demo
 
+- [Live demo on GH pages](https://orbitbot.github.io/misbehave/)
+- [Live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
+
+<br>
 ### Features
 
 
-###### Comparison with behave.js
+##### Comparison with behave.js
 
 | feature    | description                                                                                        | misbehave             | behave.js                              |
 |:-----------|:---------------------------------------------------------------------------------------------------|:---------------------:|:--------------------------------------:|
@@ -54,6 +56,8 @@ If you're using `misbehave` directly in a browser environment without a packagin
 
 <!-- Usage -->
 <!-- ... oninput -->
+
+<!-- Custom builds -->
 
 <br>
 ### Usage with Prism.js

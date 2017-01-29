@@ -4,6 +4,163 @@
 	(global.Misbehave = factory());
 }(this, (function () { 'use strict';
 
+var allNewLines = /\r\n|\r|\n/g;
+
+var onNewLine = /\r\n|\r|\n/;
+
+var leadingWhitespace = /^\s*/;
+
+var allCharacters = /./g;
+
+var removeIfStartsWith = function (s) { return function (line) { return line.startsWith(s) ? line.slice(s.length) : line; }; };
+
+var defineNewLine = function () {
+  var ta = document.createElement('textarea');
+  ta.value = '\n';
+  if (ta.value.length === 2)
+    { return '\r\n' }
+  else
+    { return '\n' }
+};
+
+var autoIndent = function (newLine, tab, prefix, selected, suffix) {
+  var prevLine = prefix.split(onNewLine).splice(-1)[0];
+  var prefEnd = prefix.slice(-1);
+  var suffStart = suffix.charAt(0);
+
+  if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
+    var whitespace = prevLine.match(leadingWhitespace)[0];
+    prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ');
+  } else if (prefEnd === '{') {
+    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab;
+    if (suffStart === '}')
+      { suffix = newLine + prevLine.match(leadingWhitespace)[0] + suffix; }
+  } else {
+    prefix += newLine + prevLine.match(leadingWhitespace)[0];
+  }
+  selected = '';
+  if (suffix === '') { suffix = newLine; }
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+var autoOpen = function (opening, closing, prefix, selected, suffix) {
+  prefix += opening;
+  suffix = closing + suffix;
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+var autoStrip = function (prefix, selected, suffix) {
+  prefix = prefix.slice(0, -1);
+  suffix = suffix.slice(1);
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+// content in selection is handled in index.js
+var testAutoStrip = function (pairs, prefix, selected, suffix) {
+  var result = false;
+  pairs.forEach(function (ref) {
+    var opening = ref[0];
+    var closing = ref[1];
+
+    closing = closing ? closing : opening;
+    if (prefix.slice(-1) === opening && suffix.charAt(0) === closing) { result = true; }
+  });
+  return result
+};
+
+var overwrite = function (closing, prefix, selected, suffix) {
+  prefix += closing;
+  suffix = suffix.slice(1);
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+// content in selection is handled in index.js
+var testOverwrite = function (closing, prefix, selected, suffix) {
+  return suffix.charAt(0) === closing
+};
+
+var tabIndent = function (newLine, tab, prefix, selected, suffix) {
+  var prefLines = prefix.split(onNewLine);
+  var prevLine = prefLines.splice(-1)[0];
+
+  if (selected === '') {
+    if (tab === '\t' || prevLine.length % tab.length === 0) {
+      prefix += tab;
+    } else {
+      prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
+    }
+  } else {
+    prevLine = tab + prevLine;
+    prefix = prefLines.concat(prevLine).join(newLine);
+    selected = selected.replace(allNewLines, newLine + tab);
+  }
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
+  var lines = selected.split(onNewLine);
+  var prevLine = prefix.split(onNewLine).splice(-1)[0];
+
+  if (lines.length === 1) {
+    if (prefix.endsWith(tab))
+      { prefix = prefix.slice(0, -tab.length); }
+    else { // indent instead
+      if (tab === '\t' || prevLine.length % tab.length === 0) {
+        prefix += tab;
+      } else {
+        prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
+      }
+    }
+  } else {
+    var prevLength = prevLine.length;
+    if (prevLength) {
+      prevLine = removeIfStartsWith(tab)(prevLine);
+      prefix = prefix.slice(0, -prevLength) + prevLine;
+    }
+    lines = lines.map(removeIfStartsWith(tab));
+    selected = lines.join(newLine);
+  }
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+function StrUtil(newLine, tab) {
+  return {
+    autoIndent    : function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return autoIndent.apply(void 0, [ newLine, tab ].concat( args ));
+  },
+    autoOpen      : autoOpen,
+    autoStrip     : autoStrip,
+    testAutoStrip : testAutoStrip,
+    overwrite     : overwrite,
+    testOverwrite : testOverwrite,
+    tabIndent     : function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return tabIndent.apply(void 0, [ newLine, tab ].concat( args ));
+  },
+    tabUnindent   : function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return tabUnindent.apply(void 0, [ newLine, tab ].concat( args ));
+  }
+  }
+}
+
+function store(value) {
+  function gettersetter() {
+    if (arguments.length) {
+      value = arguments[0];
+    }
+    return value
+  }
+  return gettersetter
+}
+
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -1024,153 +1181,6 @@ https://github.com/ArthurClemens/Javascript-Undo-Manager
 }());
 });
 
-var allNewLines = /\r\n|\r|\n/g;
-
-var onNewLine = /\r\n|\r|\n/;
-
-var leadingWhitespace = /^\s*/;
-
-var allCharacters = /./g;
-
-var removeIfStartsWith = function (s) { return function (line) { return line.startsWith(s) ? line.slice(s.length) : line; }; };
-
-var defineNewLine = function () {
-  var ta = document.createElement('textarea');
-  ta.value = '\n';
-  if (ta.value.length === 2)
-    { return '\r\n' }
-  else
-    { return '\n' }
-};
-
-var autoIndent = function (newLine, tab, prefix, selected, suffix) {
-  var prevLine = prefix.split(onNewLine).splice(-1)[0];
-  var prefEnd = prefix.slice(-1);
-  var suffStart = suffix.charAt(0);
-
-  if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
-    var whitespace = prevLine.match(leadingWhitespace)[0];
-    prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ');
-  } else if (prefEnd === '{') {
-    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab;
-    if (suffStart === '}')
-      { suffix = newLine + prevLine.match(leadingWhitespace)[0] + suffix; }
-  } else {
-    prefix += newLine + prevLine.match(leadingWhitespace)[0];
-  }
-  selected = '';
-  if (suffix === '') { suffix = newLine; }
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-var autoOpen = function (opening, closing, prefix, selected, suffix) {
-  prefix += opening;
-  suffix = closing + suffix;
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-var autoStrip = function (prefix, selected, suffix) {
-  prefix = prefix.slice(0, -1);
-  suffix = suffix.slice(1);
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-// content in selection is handled in index.js
-var testAutoStrip = function (pairs, prefix, selected, suffix) {
-  var result = false;
-  pairs.forEach(function (ref) {
-    var opening = ref[0];
-    var closing = ref[1];
-
-    closing = closing ? closing : opening;
-    if (prefix.slice(-1) === opening && suffix.charAt(0) === closing) { result = true; }
-  });
-  return result
-};
-
-var overwrite = function (closing, prefix, selected, suffix) {
-  prefix += closing;
-  suffix = suffix.slice(1);
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-// content in selection is handled in index.js
-var testOverwrite = function (closing, prefix, selected, suffix) {
-  return suffix.charAt(0) === closing
-};
-
-var tabIndent = function (newLine, tab, prefix, selected, suffix) {
-  var prefLines = prefix.split(onNewLine);
-  var prevLine = prefLines.splice(-1)[0];
-
-  if (selected === '') {
-    if (tab === '\t' || prevLine.length % tab.length === 0) {
-      prefix += tab;
-    } else {
-      prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
-    }
-  } else {
-    prevLine = tab + prevLine;
-    prefix = prefLines.concat(prevLine).join(newLine);
-    selected = selected.replace(allNewLines, newLine + tab);
-  }
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
-  var lines = selected.split(onNewLine);
-  var prevLine = prefix.split(onNewLine).splice(-1)[0];
-
-  if (lines.length === 1) {
-    if (prefix.endsWith(tab))
-      { prefix = prefix.slice(0, -tab.length); }
-    else { // indent instead
-      if (tab === '\t' || prevLine.length % tab.length === 0) {
-        prefix += tab;
-      } else {
-        prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
-      }
-    }
-  } else {
-    var prevLength = prevLine.length;
-    if (prevLength) {
-      prevLine = removeIfStartsWith(tab)(prevLine);
-      prefix = prefix.slice(0, -prevLength) + prevLine;
-    }
-    lines = lines.map(removeIfStartsWith(tab));
-    selected = lines.join(newLine);
-  }
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-function StrUtil(newLine, tab) {
-  return {
-    autoIndent    : function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      return autoIndent.apply(void 0, [ newLine, tab ].concat( args ));
-  },
-    autoOpen      : autoOpen,
-    autoStrip     : autoStrip,
-    testAutoStrip : testAutoStrip,
-    overwrite     : overwrite,
-    testOverwrite : testOverwrite,
-    tabIndent     : function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      return tabIndent.apply(void 0, [ newLine, tab ].concat( args ));
-  },
-    tabUnindent   : function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      return tabUnindent.apply(void 0, [ newLine, tab ].concat( args ));
-  }
-  }
-}
-
 var getSections = function (elem, callback) {
   var sel, range, tempRange, prefix = '', selected = '', suffix = '';
 
@@ -1260,32 +1270,23 @@ var setSelection = function (elem, start, end) {
   }
 };
 
-function store(value) {
-  function gettersetter() {
-    if (arguments.length) {
-      value = arguments[0];
-    }
-    return value
-  }
-  return gettersetter
-}
-
-var Misbehave = function Misbehave(elem, ref) {
+var Editable = function Editable(elem, ref) {
   if ( ref === void 0 ) ref = {};
-  var autoIndent$$1 = ref.autoIndent; if ( autoIndent$$1 === void 0 ) autoIndent$$1 = true;
-  var autoOpen$$1 = ref.autoOpen; if ( autoOpen$$1 === void 0 ) autoOpen$$1 = true;
-  var autoStrip$$1 = ref.autoStrip; if ( autoStrip$$1 === void 0 ) autoStrip$$1 = true;
-  var overwrite$$1 = ref.overwrite; if ( overwrite$$1 === void 0 ) overwrite$$1 = true;
+  var autoIndent = ref.autoIndent; if ( autoIndent === void 0 ) autoIndent = true;
+  var autoOpen = ref.autoOpen; if ( autoOpen === void 0 ) autoOpen = true;
+  var autoStrip = ref.autoStrip; if ( autoStrip === void 0 ) autoStrip = true;
+  var overwrite = ref.overwrite; if ( overwrite === void 0 ) overwrite = true;
   var softTabs = ref.softTabs; if ( softTabs === void 0 ) softTabs = 2;
   var replaceTab = ref.replaceTab; if ( replaceTab === void 0 ) replaceTab = true;
   var pairs = ref.pairs; if ( pairs === void 0 ) pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]];
   var oninput = ref.oninput; if ( oninput === void 0 ) oninput = function () {};
   var undoLimit = ref.undoLimit; if ( undoLimit === void 0 ) undoLimit = 0;
+  var StrUtil = ref.StrUtil;
+  var store = ref.store;
 
 
-  var misbehave = this;
+  var editable = this;
   var strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t');
-  var current = store({ prefix: '', selected: '', suffix: '' });
 
   var undoMgr = new undomanager();
   undoMgr.setLimit(undoLimit);
@@ -1298,12 +1299,12 @@ var Misbehave = function Misbehave(elem, ref) {
   };
 
   var update = function (content) {
-    var previous = current();
+    var previous = store();
     undoMgr.add({
       undo : function () { setDom(previous); },
       redo : function () { setDom(content); }
     });
-    current(content);
+    store(content);
     setDom(content);
   };
 
@@ -1313,7 +1314,7 @@ var Misbehave = function Misbehave(elem, ref) {
   keys.bind('mod+z', function () { undoMgr.undo(); return false });
   keys.bind('shift+mod+z', function () { undoMgr.redo(); return false });
 
-  if (autoIndent$$1) {
+  if (autoIndent) {
     keys.bind('enter', function () { return getSections(elem, function (ref) {
       var prefix = ref.prefix;
       var selected = ref.selected;
@@ -1324,7 +1325,7 @@ var Misbehave = function Misbehave(elem, ref) {
     }); });
   }
 
-  if (autoStrip$$1) {
+  if (autoStrip) {
     keys.bind('backspace', function () { return getSections(elem, function (ref, selection) {
       var prefix = ref.prefix;
       var selected = ref.selected;
@@ -1362,10 +1363,10 @@ var Misbehave = function Misbehave(elem, ref) {
     var closing = ref[1];
 
     if (closing) {
-      if (autoOpen$$1){ keys.bind(opening, fnAutoOpen(opening, closing)); }
-      if (overwrite$$1) { keys.bind(closing, fnOverwrite(closing)); }
+      if (autoOpen){ keys.bind(opening, fnAutoOpen(opening, closing)); }
+      if (overwrite) { keys.bind(closing, fnOverwrite(closing)); }
     } else {
-      if (autoOpen$$1 && overwrite$$1) {
+      if (autoOpen && overwrite) {
         keys.bind(opening, function () { return getSections(elem, function (ref, selection) {
           var prefix = ref.prefix;
           var selected = ref.selected;
@@ -1378,8 +1379,8 @@ var Misbehave = function Misbehave(elem, ref) {
           return false
         }); });
       } else {
-        if (autoOpen$$1){ keys.bind(opening, fnAutoOpen(opening, opening)); }
-        if (overwrite$$1) { keys.bind(opening, fnOverwrite(opening)); }
+        if (autoOpen){ keys.bind(opening, fnAutoOpen(opening, opening)); }
+        if (overwrite) { keys.bind(opening, fnOverwrite(opening)); }
       }
     }
   });
@@ -1404,25 +1405,42 @@ var Misbehave = function Misbehave(elem, ref) {
     }); });
   }
 
-  misbehave.__inputListener = elem.addEventListener('input', function () { return getSections(elem, update); });
+  editable.__inputListener = elem.addEventListener('input', function () { return getSections(elem, update); });
 
-  oninput(elem.textContent);
+  setDom(store());
 
   // expose for haxxoers
-  misbehave.__elem = elem;
-  misbehave.__strUtil = strUtil;
-  misbehave.__undoMgr = undoMgr;
-  misbehave.__current = current;
-  misbehave.__setDom = setDom;
-  misbehave.__update = update;
-  misbehave.__keys = keys;
+  editable.__elem = elem;
+  editable.__strUtil = strUtil;
+  editable.__undoMgr = undoMgr;
+  editable.__store = store;
+  editable.__setDom = setDom;
+  editable.__update = update;
+  editable.__keys = keys;
 };
 
-Misbehave.prototype.destroy = function destroy () {
+Editable.prototype.destroy = function destroy () {
   this.__elem.removeEventListener('input', this.__inputListener);
   this.__keys.detach();
   this.__undoMgr.clear();
 };
+
+var Misbehave = (function (Editable$$1) {
+  function Misbehave(elem, opts) {
+    if ( opts === void 0 ) opts = {};
+
+    if (typeof opts.store === 'undefined') { opts.store = store({ prefix: '', selected: '', suffix: '' }); }
+    if (typeof opts.StrUtil === 'undefined') { opts.StrUtil = StrUtil; }
+
+    Editable$$1.call(this, elem, opts);
+  }
+
+  if ( Editable$$1 ) Misbehave.__proto__ = Editable$$1;
+  Misbehave.prototype = Object.create( Editable$$1 && Editable$$1.prototype );
+  Misbehave.prototype.constructor = Misbehave;
+
+  return Misbehave;
+}(Editable));
 
 return Misbehave;
 
