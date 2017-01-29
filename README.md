@@ -1,7 +1,7 @@
 # misbehave
 > Add IDE-like text entry to HTML contenteditable tags
 
-`misbehave` is a small library for adding IDE-like text entry to HTML `contenteditable` tags, inspired by [behave.js](https://github.com/iamso/Behave.js). When you need something, but [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) seem large (they're probably more robust, so pick your poison).
+`misbehave` is a small library (~ 11KB min+gz) for adding IDE-like text entry to HTML `contenteditable` tags, inspired by [behave.js](https://github.com/iamso/Behave.js). When you need something, but [Ace Editor](https://github.com/ajaxorg/ace) and [CodeMirror](https://github.com/codemirror/CodeMirror) seem large (they're probably more robust and feature-packed, so pick your poison).
 
 `misbehave` is modular and contains string utils that should be re-usable if you need to implement f.e. auto-indent in an IDE-like way. Text entry _"behavior"_ is configurable in `misbehave`, the default build supports javascript text entry based on functionality from Sublime Text 3. [Check the behaviors README](behaviors/README.md) for details and the subfolders under `behaviors/` for implementations.
 
@@ -51,7 +51,7 @@ or use
 $ npm install misbehave
 ```
 
-The URL provided above is a "development" URL from RawGit, you should switch to the "production" URL to ensure that you're getting a known version and don't have issues with traffic limits or throttling if using `misbehave` like this on a more permanent basis.
+The URL provided above is a uncompressed "development" URL from RawGit, you should at least switch to the "production" URL to ensure that you're getting a known version and don't have issues with traffic limits or throttling if using `misbehave` like this on a more permanent basis.
 
 If you're using `misbehave` directly in a browser environment without a packaging toolchain, the constructor is attached `window.Misbehave`.
 
@@ -75,7 +75,7 @@ The library exposes a `Misbehave` module or browser global, which is a construct
 let editoresque = new Misbehave(document.querySelector('#code'))
 ```
 
-`misbehave` will then process text entered into the `<code>` element only. The other attributes specified in HTML are there to remove default browser functionality that may be distracting when entering source code instead of regular text.
+`misbehave` will then process events on the `<code>` element only. The other attributes specified in HTML are there to remove default browser functionality that may be distracting when entering source code instead of regular text.
 
 <br>
 ### API
@@ -86,7 +86,7 @@ For the purpose of this section, let's assign the variable `misbehave` the resul
 
 **`new Misbehave(element, options) ⇒ misbehave instance`**
 
-Provide a `contenteditable` DOM node to the constructor as in [the Usage example](#usage) above. Options, their meaning and the defaults are show in [Options and defaults](#options-and-defaults).
+Provide a `contenteditable` DOM node to the constructor as in [the Usage example](#usage) above. Options, their meaning and the defaults are show in [Options and defaults](#options-and-defaults). The options parameter is not required.
 
 
 <br>
@@ -124,7 +124,7 @@ The second parameter to the `Misbehave` constructor is a configurations object, 
 }
 ```
 
-The functionality of `autoIndent`, `autoOpen`, `autoStrip`, `overwrite`, `softTabs` and `replaceTab` are as described in [Comparison with behave.js](). The CSS [`tab-size` property](https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size) can be used to set the desired tab width if the `softTabs` option is set to `false`.
+The functionality of `autoIndent`, `autoOpen`, `autoStrip`, `overwrite`, `softTabs` and `replaceTab` are as described in [Comparison with behave.js](#comparison-with-behavejs). The CSS [`tab-size` property](https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size) can be used to set the desired tab width if the `softTabs` option is set to `false`.
 
 **`pairs`** is an array containing nested arrays of `[<opening>, <closing>]` character pairs that the `autoOpen`, `autoStrip` and `overwrite` options apply to. If a "pair" consists of identical characters, such as quotation marks `"`, a single element passed is sufficient. As an example, if you would like to define `*`, and `<` and `>` as special characters, pass `[['<', '>'], ['*']]` as the `pairs` option.
 
