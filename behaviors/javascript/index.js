@@ -6,7 +6,7 @@ import {
   onNewLine,
   allNewLines,
   allCharacters
-} from './utils'
+} from '../utils'
 
 
 export const autoIndent = (newLine, tab, prefix, selected, suffix) => {

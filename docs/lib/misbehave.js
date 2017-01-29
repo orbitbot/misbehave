@@ -4,254 +4,6 @@
 	(global.Misbehave = factory());
 }(this, (function () { 'use strict';
 
-var allNewLines = /\r\n|\r|\n/g;
-
-var onNewLine = /\r\n|\r|\n/;
-
-var leadingWhitespace = /^\s*/;
-
-var allCharacters = /./g;
-
-var removeIfStartsWith = function (s) { return function (line) { return line.startsWith(s) ? line.slice(s.length) : line; }; };
-
-var defineNewLine = function () {
-  var ta = document.createElement('textarea');
-  ta.value = '\n';
-  if (ta.value.length === 2)
-    { return '\r\n' }
-  else
-    { return '\n' }
-};
-
-var autoIndent = function (newLine, tab, prefix, selected, suffix) {
-  var prevLine = prefix.split(onNewLine).splice(-1)[0];
-  var prefEnd = prefix.slice(-1);
-  var suffStart = suffix.charAt(0);
-
-  if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
-    var whitespace = prevLine.match(leadingWhitespace)[0];
-    prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ');
-  } else if (prefEnd === '{') {
-    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab;
-    if (suffStart === '}')
-      { suffix = newLine + prevLine.match(leadingWhitespace)[0] + suffix; }
-  } else {
-    prefix += newLine + prevLine.match(leadingWhitespace)[0];
-  }
-  selected = '';
-  if (suffix === '') { suffix = newLine; }
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-var autoOpen = function (opening, closing, prefix, selected, suffix) {
-  prefix += opening;
-  suffix = closing + suffix;
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-var autoStrip = function (prefix, selected, suffix) {
-  prefix = prefix.slice(0, -1);
-  suffix = suffix.slice(1);
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-// content in selection is handled in index.js
-var testAutoStrip = function (pairs, prefix, selected, suffix) {
-  var result = false;
-  pairs.forEach(function (ref) {
-    var opening = ref[0];
-    var closing = ref[1];
-
-    closing = closing ? closing : opening;
-    if (prefix.slice(-1) === opening && suffix.charAt(0) === closing) { result = true; }
-  });
-  return result
-};
-
-var overwrite = function (closing, prefix, selected, suffix) {
-  prefix += closing;
-  suffix = suffix.slice(1);
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-// content in selection is handled in index.js
-var testOverwrite = function (closing, prefix, selected, suffix) {
-  return suffix.charAt(0) === closing
-};
-
-var tabIndent = function (newLine, tab, prefix, selected, suffix) {
-  var prefLines = prefix.split(onNewLine);
-  var prevLine = prefLines.splice(-1)[0];
-
-  if (selected === '') {
-    if (tab === '\t' || prevLine.length % tab.length === 0) {
-      prefix += tab;
-    } else {
-      prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
-    }
-  } else {
-    prevLine = tab + prevLine;
-    prefix = prefLines.concat(prevLine).join(newLine);
-    selected = selected.replace(allNewLines, newLine + tab);
-  }
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
-  var lines = selected.split(onNewLine);
-  var prevLine = prefix.split(onNewLine).splice(-1)[0];
-
-  if (lines.length === 1) {
-    if (prefix.endsWith(tab))
-      { prefix = prefix.slice(0, -tab.length); }
-    else { // indent instead
-      if (tab === '\t' || prevLine.length % tab.length === 0) {
-        prefix += tab;
-      } else {
-        prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
-      }
-    }
-  } else {
-    var prevLength = prevLine.length;
-    if (prevLength) {
-      prevLine = removeIfStartsWith(tab)(prevLine);
-      prefix = prefix.slice(0, -prevLength) + prevLine;
-    }
-    lines = lines.map(removeIfStartsWith(tab));
-    selected = lines.join(newLine);
-  }
-  return { prefix: prefix, selected: selected, suffix: suffix }
-};
-
-function StrUtil(newLine, tab) {
-  return {
-    autoIndent    : function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      return autoIndent.apply(void 0, [ newLine, tab ].concat( args ));
-  },
-    autoOpen      : autoOpen,
-    autoStrip     : autoStrip,
-    testAutoStrip : testAutoStrip,
-    overwrite     : overwrite,
-    testOverwrite : testOverwrite,
-    tabIndent     : function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      return tabIndent.apply(void 0, [ newLine, tab ].concat( args ));
-  },
-    tabUnindent   : function () {
-      var args = [], len = arguments.length;
-      while ( len-- ) args[ len ] = arguments[ len ];
-
-      return tabUnindent.apply(void 0, [ newLine, tab ].concat( args ));
-  }
-  }
-}
-
-function store(value) {
-  function gettersetter() {
-    if (arguments.length) {
-      value = arguments[0];
-    }
-    return value
-  }
-  return gettersetter
-}
-
-var getSections = function (elem, callback) {
-  var sel, range, tempRange, prefix = '', selected = '', suffix = '';
-
-  if (document.activeElement !== elem) {
-    suffix = elem.textContent;
-  } else if (typeof window.getSelection !== 'undefined') {
-    sel = window.getSelection();
-    selected = sel.toString();
-    if (sel.rangeCount) {
-      range = sel.getRangeAt(0);
-    } else {
-      range = document.createRange();
-      range.collapse(true);
-    }
-    tempRange = document.createRange();
-    tempRange.selectNodeContents(elem);
-    tempRange.setEnd(range.startContainer, range.startOffset);
-    prefix = tempRange.toString();
-
-    tempRange.selectNodeContents(elem);
-    tempRange.setStart(range.endContainer, range.endOffset);
-    suffix = tempRange.toString();
-
-    tempRange.detach();
-  } else if ( (sel = document.selection) && sel.type != 'Control') {
-    range = sel.createRange();
-    tempRange = document.body.createTextRange();
-    selected = tempRange.text;
-
-    tempRange.moveToElementText(elem);
-    tempRange.setEndPoint('EndToStart', range);
-    prefix = tempRange.text;
-
-    tempRange.moveToElementText(elem);
-    tempRange.setEndPoint('StartToEnd', range);
-    suffix = tempRange.text;
-  }
-
-  if (callback)
-    { return callback({ prefix: prefix, selected: selected, suffix: suffix }, sel) }
-  else
-    { return { prefix: prefix, selected: selected, suffix: suffix } }
-};
-
-var getTextNodesIn = function (node) {
-  var textNodes = [];
-  if (node.nodeType == 3) {
-    textNodes.push(node);
-  } else {
-    var children = node.childNodes;
-    for (var i = 0, len = children.length; i < len; ++i) {
-      textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
-    }
-  }
-  return textNodes
-};
-
-var setSelection = function (elem, start, end) {
-  if (document.createRange && window.getSelection) {
-    var range = document.createRange();
-    range.selectNodeContents(elem);
-    var textNodes = getTextNodesIn(elem);
-    var foundStart = false;
-    var charCount = 0, endCharCount;
-
-    for (var i = 0, textNode; textNode = textNodes[i++]; ) {
-      endCharCount = charCount + textNode.length;
-      if (!foundStart && start >= charCount && (start < endCharCount || (start == endCharCount && i <= textNodes.length))) {
-        range.setStart(textNode, start - charCount);
-        foundStart = true;
-      }
-      if (foundStart && end <= endCharCount) {
-        range.setEnd(textNode, end - charCount);
-        break
-      }
-      charCount = endCharCount;
-    }
-
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
-  } else if (document.selection && document.body.createTextRange) {
-    var textRange = document.body.createTextRange();
-    textRange.moveToElementText(elem);
-    textRange.collapse(true);
-    textRange.moveEnd('character', end);
-    textRange.moveStart('character', start);
-    textRange.select();
-  }
-};
-
 function createCommonjsModule(fn, module) {
 	return module = { exports: {} }, fn(module, module.exports), module.exports;
 }
@@ -1272,6 +1024,116 @@ https://github.com/ArthurClemens/Javascript-Undo-Manager
 }());
 });
 
+var getSections = function (elem, callback) {
+  var sel, range, tempRange, prefix = '', selected = '', suffix = '';
+
+  if (document.activeElement !== elem) {
+    suffix = elem.textContent;
+  } else if (typeof window.getSelection !== 'undefined') {
+    sel = window.getSelection();
+    selected = sel.toString();
+    if (sel.rangeCount) {
+      range = sel.getRangeAt(0);
+    } else {
+      range = document.createRange();
+      range.collapse(true);
+    }
+    tempRange = document.createRange();
+    tempRange.selectNodeContents(elem);
+    tempRange.setEnd(range.startContainer, range.startOffset);
+    prefix = tempRange.toString();
+
+    tempRange.selectNodeContents(elem);
+    tempRange.setStart(range.endContainer, range.endOffset);
+    suffix = tempRange.toString();
+
+    tempRange.detach();
+  } else if ( (sel = document.selection) && sel.type != 'Control') {
+    range = sel.createRange();
+    tempRange = document.body.createTextRange();
+    selected = tempRange.text;
+
+    tempRange.moveToElementText(elem);
+    tempRange.setEndPoint('EndToStart', range);
+    prefix = tempRange.text;
+
+    tempRange.moveToElementText(elem);
+    tempRange.setEndPoint('StartToEnd', range);
+    suffix = tempRange.text;
+  }
+
+  if (callback)
+    { return callback({ prefix: prefix, selected: selected, suffix: suffix }, sel) }
+  else
+    { return { prefix: prefix, selected: selected, suffix: suffix } }
+};
+
+var getTextNodesIn = function (node) {
+  var textNodes = [];
+  if (node.nodeType == 3) {
+    textNodes.push(node);
+  } else {
+    var children = node.childNodes;
+    for (var i = 0, len = children.length; i < len; ++i) {
+      textNodes.push.apply(textNodes, getTextNodesIn(children[i]));
+    }
+  }
+  return textNodes
+};
+
+var setSelection = function (elem, start, end) {
+  if (document.createRange && window.getSelection) {
+    var range = document.createRange();
+    range.selectNodeContents(elem);
+    var textNodes = getTextNodesIn(elem);
+    var foundStart = false;
+    var charCount = 0, endCharCount;
+
+    for (var i = 0, textNode; textNode = textNodes[i++]; ) {
+      endCharCount = charCount + textNode.length;
+      if (!foundStart && start >= charCount && (start < endCharCount || (start == endCharCount && i <= textNodes.length))) {
+        range.setStart(textNode, start - charCount);
+        foundStart = true;
+      }
+      if (foundStart && end <= endCharCount) {
+        range.setEnd(textNode, end - charCount);
+        break
+      }
+      charCount = endCharCount;
+    }
+
+    var sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else if (document.selection && document.body.createTextRange) {
+    var textRange = document.body.createTextRange();
+    textRange.moveToElementText(elem);
+    textRange.collapse(true);
+    textRange.moveEnd('character', end);
+    textRange.moveStart('character', start);
+    textRange.select();
+  }
+};
+
+var allNewLines = /\r\n|\r|\n/g;
+
+var onNewLine = /\r\n|\r|\n/;
+
+var leadingWhitespace = /^\s*/;
+
+var allCharacters = /./g;
+
+var removeIfStartsWith = function (s) { return function (line) { return line.startsWith(s) ? line.slice(s.length) : line; }; };
+
+var defineNewLine = function () {
+  var ta = document.createElement('textarea');
+  ta.value = '\n';
+  if (ta.value.length === 2)
+    { return '\r\n' }
+  else
+    { return '\n' }
+};
+
 var Editable = function Editable(elem, ref) {
   if ( ref === void 0 ) ref = {};
   var autoIndent = ref.autoIndent; if ( autoIndent === void 0 ) autoIndent = true;
@@ -1283,12 +1145,12 @@ var Editable = function Editable(elem, ref) {
   var pairs = ref.pairs; if ( pairs === void 0 ) pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]];
   var oninput = ref.oninput; if ( oninput === void 0 ) oninput = function () {};
   var undoLimit = ref.undoLimit; if ( undoLimit === void 0 ) undoLimit = 0;
-  var StrUtil = ref.StrUtil;
+  var behavior = ref.behavior;
   var store = ref.store;
 
 
   var editable = this;
-  var strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t');
+  var handler = behavior(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t');
 
   var undoMgr = new undomanager();
   undoMgr.setLimit(undoLimit);
@@ -1322,7 +1184,7 @@ var Editable = function Editable(elem, ref) {
       var selected = ref.selected;
       var suffix = ref.suffix;
 
-      update(strUtil.autoIndent(prefix, selected, suffix));
+      update(handler.autoIndent(prefix, selected, suffix));
       return false
     }); });
   }
@@ -1333,8 +1195,8 @@ var Editable = function Editable(elem, ref) {
       var selected = ref.selected;
       var suffix = ref.suffix;
 
-      if (selection.isCollapsed && strUtil.testAutoStrip(pairs, prefix, selected, suffix)) {
-        update(strUtil.autoStrip(prefix, selected, suffix));
+      if (selection.isCollapsed && handler.testAutoStrip(pairs, prefix, selected, suffix)) {
+        update(handler.autoStrip(prefix, selected, suffix));
         return false
       }
     }); });
@@ -1345,7 +1207,7 @@ var Editable = function Editable(elem, ref) {
     var selected = ref.selected;
     var suffix = ref.suffix;
 
-    update(strUtil.autoOpen(opening, closing, prefix, selected, suffix));
+    update(handler.autoOpen(opening, closing, prefix, selected, suffix));
     return false
   }); }; };
 
@@ -1354,8 +1216,8 @@ var Editable = function Editable(elem, ref) {
     var selected = ref.selected;
     var suffix = ref.suffix;
 
-    if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
-      update(strUtil.overwrite(closing, prefix, selected, suffix));
+    if (selection.isCollapsed && handler.testOverwrite(closing, prefix, selected, suffix)) {
+      update(handler.overwrite(closing, prefix, selected, suffix));
       return false
     }
   }); }; };
@@ -1374,10 +1236,10 @@ var Editable = function Editable(elem, ref) {
           var selected = ref.selected;
           var suffix = ref.suffix;
 
-          if (selection.isCollapsed && strUtil.testOverwrite(opening, prefix, selected, suffix))
-            { update(strUtil.overwrite(opening, prefix, selected, suffix)); }
+          if (selection.isCollapsed && handler.testOverwrite(opening, prefix, selected, suffix))
+            { update(handler.overwrite(opening, prefix, selected, suffix)); }
           else
-            { update(strUtil.autoOpen(opening, opening, prefix, selected, suffix)); }
+            { update(handler.autoOpen(opening, opening, prefix, selected, suffix)); }
           return false
         }); });
       } else {
@@ -1393,7 +1255,7 @@ var Editable = function Editable(elem, ref) {
       var selected = ref.selected;
       var suffix = ref.suffix;
 
-      update(strUtil.tabIndent(prefix, selected, suffix));
+      update(handler.tabIndent(prefix, selected, suffix));
       return false
     }); });
 
@@ -1402,7 +1264,7 @@ var Editable = function Editable(elem, ref) {
       var selected = ref.selected;
       var suffix = ref.suffix;
 
-      update(strUtil.tabUnindent(prefix, selected, suffix));
+      update(handler.tabUnindent(prefix, selected, suffix));
       return false
     }); });
   }
@@ -1413,7 +1275,7 @@ var Editable = function Editable(elem, ref) {
 
   // expose for haxxoers
   editable.elem = elem;
-  editable.strUtil = strUtil;
+  editable.handler = handler;
   editable.undoMgr = undoMgr;
   editable.store = store;
   editable.setDom = setDom;
@@ -1435,12 +1297,150 @@ Editable.prototype.blur = function blur () {
   this.elem.blur();
 };
 
+function store(value) {
+  function gettersetter() {
+    if (arguments.length) {
+      value = arguments[0];
+    }
+    return value
+  }
+  return gettersetter
+}
+
+var autoIndent = function (newLine, tab, prefix, selected, suffix) {
+  var prevLine = prefix.split(onNewLine).splice(-1)[0];
+  var prefEnd = prefix.slice(-1);
+  var suffStart = suffix.charAt(0);
+
+  if ((prevLine.match(/\(/g) || []).length > (prevLine.match(/\)/g) || []).length) {
+    var whitespace = prevLine.match(leadingWhitespace)[0];
+    prefix += newLine + whitespace + prevLine.slice(whitespace.length, prevLine.lastIndexOf('(') + 1).replace(allCharacters, ' ');
+  } else if (prefEnd === '{') {
+    prefix += newLine + prevLine.match(leadingWhitespace)[0] + tab;
+    if (suffStart === '}')
+      { suffix = newLine + prevLine.match(leadingWhitespace)[0] + suffix; }
+  } else {
+    prefix += newLine + prevLine.match(leadingWhitespace)[0];
+  }
+  selected = '';
+  if (suffix === '') { suffix = newLine; }
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+var autoOpen = function (opening, closing, prefix, selected, suffix) {
+  prefix += opening;
+  suffix = closing + suffix;
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+var autoStrip = function (prefix, selected, suffix) {
+  prefix = prefix.slice(0, -1);
+  suffix = suffix.slice(1);
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+// content in selection is handled in index.js
+var testAutoStrip = function (pairs, prefix, selected, suffix) {
+  var result = false;
+  pairs.forEach(function (ref) {
+    var opening = ref[0];
+    var closing = ref[1];
+
+    closing = closing ? closing : opening;
+    if (prefix.slice(-1) === opening && suffix.charAt(0) === closing) { result = true; }
+  });
+  return result
+};
+
+var overwrite = function (closing, prefix, selected, suffix) {
+  prefix += closing;
+  suffix = suffix.slice(1);
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+// content in selection is handled in index.js
+var testOverwrite = function (closing, prefix, selected, suffix) {
+  return suffix.charAt(0) === closing
+};
+
+var tabIndent = function (newLine, tab, prefix, selected, suffix) {
+  var prefLines = prefix.split(onNewLine);
+  var prevLine = prefLines.splice(-1)[0];
+
+  if (selected === '') {
+    if (tab === '\t' || prevLine.length % tab.length === 0) {
+      prefix += tab;
+    } else {
+      prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
+    }
+  } else {
+    prevLine = tab + prevLine;
+    prefix = prefLines.concat(prevLine).join(newLine);
+    selected = selected.replace(allNewLines, newLine + tab);
+  }
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+var tabUnindent = function (newLine, tab, prefix, selected, suffix) {
+  var lines = selected.split(onNewLine);
+  var prevLine = prefix.split(onNewLine).splice(-1)[0];
+
+  if (lines.length === 1) {
+    if (prefix.endsWith(tab))
+      { prefix = prefix.slice(0, -tab.length); }
+    else { // indent instead
+      if (tab === '\t' || prevLine.length % tab.length === 0) {
+        prefix += tab;
+      } else {
+        prefix += ' '.repeat(tab.length - prevLine.length % tab.length);
+      }
+    }
+  } else {
+    var prevLength = prevLine.length;
+    if (prevLength) {
+      prevLine = removeIfStartsWith(tab)(prevLine);
+      prefix = prefix.slice(0, -prevLength) + prevLine;
+    }
+    lines = lines.map(removeIfStartsWith(tab));
+    selected = lines.join(newLine);
+  }
+  return { prefix: prefix, selected: selected, suffix: suffix }
+};
+
+function StrUtil(newLine, tab) {
+  return {
+    autoIndent    : function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return autoIndent.apply(void 0, [ newLine, tab ].concat( args ));
+  },
+    autoOpen      : autoOpen,
+    autoStrip     : autoStrip,
+    testAutoStrip : testAutoStrip,
+    overwrite     : overwrite,
+    testOverwrite : testOverwrite,
+    tabIndent     : function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return tabIndent.apply(void 0, [ newLine, tab ].concat( args ));
+  },
+    tabUnindent   : function () {
+      var args = [], len = arguments.length;
+      while ( len-- ) args[ len ] = arguments[ len ];
+
+      return tabUnindent.apply(void 0, [ newLine, tab ].concat( args ));
+  }
+  }
+}
+
 var Misbehave = (function (Editable$$1) {
   function Misbehave(elem, opts) {
     if ( opts === void 0 ) opts = {};
 
     if (typeof opts.store === 'undefined') { opts.store = store(getSections(elem)); }
-    if (typeof opts.StrUtil === 'undefined') { opts.StrUtil = StrUtil; }
+    if (typeof opts.behavior === 'undefined') { opts.behavior = StrUtil; }
 
     Editable$$1.call(this, elem, opts);
   }

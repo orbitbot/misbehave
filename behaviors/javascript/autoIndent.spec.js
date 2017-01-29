@@ -1,9 +1,10 @@
 let chai = require('chai')
 let should = chai.should()
 
-let string = require('../utils/string')
+let string = require('./index')
 
 describe('autoIndent', () => {
+
   it('indents to leading whitespace by default', () => {
     ({ prefix, selected, suffix } = string.autoIndent('\n', '\t', '\t  function\t', '', '\n'))
     prefix.should.equal('\t  function\t\n\t  ')

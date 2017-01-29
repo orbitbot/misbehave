@@ -1,15 +1,15 @@
 'use strict';
 
-import strUtil from './utils/string'
+import Editable from './editable'
 import store from './utils/store'
 import { getSections } from './utils/selection'
-import Editable from './editable'
+import js from './behaviors/javascript'
 
 
 export default class Misbehave extends Editable {
   constructor(elem, opts = {}) {
     if (typeof opts.store === 'undefined') opts.store = store(getSections(elem))
-    if (typeof opts.StrUtil === 'undefined') opts.StrUtil = strUtil
+    if (typeof opts.behavior === 'undefined') opts.behavior = js
 
     super(elem, opts)
   }

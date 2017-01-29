@@ -5,7 +5,7 @@
   "main": "misbehave.js",
   "scripts": {
     "start": "rollup --config --watch",
-    "test": "mocha --require reify test/**"
+    "test": "mocha --require reify behaviors/*/tests.js"
   },
   "keywords": [
     "contenteditable",

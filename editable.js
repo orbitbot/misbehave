@@ -3,7 +3,7 @@
 import Combokeys from 'combokeys'
 import UndoManager from 'undo-manager'
 import { getSections, setSelection } from './utils/selection'
-import { defineNewLine } from './utils/utils'
+import { defineNewLine } from './behaviors/utils'
 
 
 export default class Editable {
@@ -16,12 +16,12 @@ export default class Editable {
                       pairs = [['(', ')'], ['[', ']'], ['{', '}'], ['"'], ["'"]],
                       oninput = () => {},
                       undoLimit = 0,
-                      StrUtil,
+                      behavior,
                       store,
                     } = {}) {
 
     const editable = this
-    const strUtil = new StrUtil(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t')
+    const handler = behavior(defineNewLine(), softTabs ? ' '.repeat(softTabs) : '\t')
 
     const undoMgr = new UndoManager()
     undoMgr.setLimit(undoLimit)
@@ -51,28 +51,28 @@ export default class Editable {
 
     if (autoIndent) {
       keys.bind('enter', () => getSections(elem, ({ prefix, selected, suffix}) => {
-        update(strUtil.autoIndent(prefix, selected, suffix))
+        update(handler.autoIndent(prefix, selected, suffix))
         return false
       }))
     }
 
     if (autoStrip) {
       keys.bind('backspace', () => getSections(elem, ({ prefix, selected, suffix }, selection) => {
-        if (selection.isCollapsed && strUtil.testAutoStrip(pairs, prefix, selected, suffix)) {
-          update(strUtil.autoStrip(prefix, selected, suffix))
+        if (selection.isCollapsed && handler.testAutoStrip(pairs, prefix, selected, suffix)) {
+          update(handler.autoStrip(prefix, selected, suffix))
           return false
         }
       }))
     }
 
     const fnAutoOpen = (opening, closing) => () => getSections(elem, ({ prefix, selected, suffix }) => {
-      update(strUtil.autoOpen(opening, closing, prefix, selected, suffix))
+      update(handler.autoOpen(opening, closing, prefix, selected, suffix))
       return false
     })
 
     const fnOverwrite = (closing) => () => getSections(elem, ({ prefix, selected, suffix }, selection) => {
-      if (selection.isCollapsed && strUtil.testOverwrite(closing, prefix, selected, suffix)) {
-        update(strUtil.overwrite(closing, prefix, selected, suffix))
+      if (selection.isCollapsed && handler.testOverwrite(closing, prefix, selected, suffix)) {
+        update(handler.overwrite(closing, prefix, selected, suffix))
         return false
       }
     })
@@ -84,10 +84,10 @@ export default class Editable {
       } else {
         if (autoOpen && overwrite) {
           keys.bind(opening, () => getSections(elem, ({ prefix, selected, suffix }, selection) => {
-            if (selection.isCollapsed && strUtil.testOverwrite(opening, prefix, selected, suffix))
-              update(strUtil.overwrite(opening, prefix, selected, suffix))
+            if (selection.isCollapsed && handler.testOverwrite(opening, prefix, selected, suffix))
+              update(handler.overwrite(opening, prefix, selected, suffix))
             else
-              update(strUtil.autoOpen(opening, opening, prefix, selected, suffix))
+              update(handler.autoOpen(opening, opening, prefix, selected, suffix))
             return false
           }))
         } else {
@@ -99,12 +99,12 @@ export default class Editable {
 
     if (replaceTab) {
       keys.bind('tab', () => getSections(elem, ({ prefix, selected, suffix }) => {
-        update(strUtil.tabIndent(prefix, selected, suffix))
+        update(handler.tabIndent(prefix, selected, suffix))
         return false
       }))
 
       keys.bind('shift+tab', () => getSections(elem, ({ prefix, selected, suffix }) => {
-        update(strUtil.tabUnindent(prefix, selected, suffix))
+        update(handler.tabUnindent(prefix, selected, suffix))
         return false
       }))
     }
@@ -115,7 +115,7 @@ export default class Editable {
 
     // expose for haxxoers
     editable.elem = elem
-    editable.strUtil = strUtil
+    editable.handler = handler
     editable.undoMgr = undoMgr
     editable.store = store
     editable.setDom = setDom
