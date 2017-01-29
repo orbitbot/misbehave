@@ -53,12 +53,12 @@ $ npm install misbehave
 
 The URL provided above is a "development" URL from RawGit, you should switch to the "production" URL to ensure that you're getting a known version and don't have issues with traffic limits or throttling if using `misbehave` like this on a more permanent basis.
 
-If you're using `misbehave` directly in a browser environment without a packaging toolchain, the constructor is attached to the `Misbehave` global.
+If you're using `misbehave` directly in a browser environment without a packaging toolchain, the constructor is attached `window.Misbehave`.
 
 <br>
 ### Usage
 
-The library exposes a `Misbehave` module or browser global, which is a constructor. The constructor expects to be passed a `contenteditable` DOM node;
+The library exposes a `Misbehave` module or browser global, which is a constructor. The constructor expects a `contenteditable` DOM node:
 
 **HTML**
 ```html
@@ -86,7 +86,7 @@ For the purpose of this section, let's assign the variable `misbehave` the resul
 
 **`new Misbehave(element, options) ⇒ misbehave instance`**
 
-Provide a `contenteditable` DOM node to the constructor as in [the Usage example]() above. Options, their meaning and the defaults are show in [Options and defaults]().
+Provide a `contenteditable` DOM node to the constructor as in [the Usage example](#usage) above. Options, their meaning and the defaults are show in [Options and defaults](#options-and-defaults).
 
 
 <br>
@@ -140,7 +140,7 @@ The return value of `oninput` is ignored. The second parameter is a reference to
 
 **`behavior`** is explained [the behaviors README](behaviors/README.md), and is the way to f.e. configure Python text entry functionality for `misbehave`.
 
-**`store`** is discussed in [Store API]().
+**`store`** is discussed in [Store API](#store-api).
 
 <br>
 ##### Fields
@@ -170,12 +170,12 @@ var misbehave = new Misbehave(code, {
 })
 ```
 
-An example with the Okaida theme is [available on GH pages](https://orbitbot.github.io/misbehave/prismjs.html), the source code is in the `docs/` folder.
+An example with the Okaida theme is [available on GH pages](https://orbitbot.github.io/misbehave/prismjs.html), the example source is under `docs/`.
 
 <br>
 ### Custom builds
 
-The default build of `misbehave` is configured as a small extension to the internal [`Editable` class](editable.js). The API for this class is essentially the same as defined above, but the `store` and `behavior` options do not have defaults and need to be provided. The intent with enabling custom builds is to potentially shave some bits by leaving out the default javascript behavior and to use some other `store` implementation such as [flyd streams](https://github.com/paldepind/flyd) to observe changing data, for example.
+The [default build](index.js) of `misbehave` is configured as a small extension to the internal [`Editable` class](editable.js). The API for this class is essentially the same as defined above, but the `store` and `behavior` options do not have defaults and need to be provided. The intent with enabling custom builds is to potentially shave some bits by leaving out the default javascript behavior and to use some other `store` implementation such as [flyd streams](https://github.com/paldepind/flyd) to observe changing data, for example.
 
 ##### Behavior API
 
