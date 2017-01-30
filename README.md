@@ -86,7 +86,7 @@ For the purpose of this section, let's assign the variable `misbehave` the resul
 
 **`new Misbehave(element, options) ⇒ misbehave instance`**
 
-Provide a `contenteditable` DOM node to the constructor as in [the Usage example](#usage) above. Options, their meaning and the defaults are show in [Options and defaults](#options-and-defaults). The options parameter is not required.
+Provide a `contenteditable` DOM node to the constructor as in [the Usage example](#usage) above. Options, their meaning and the defaults are show in [Options and defaults](#options-and-defaults). The options parameter is not required. The constructor does not set the `contenteditable` or any of the other attributes in the example. The DOM node is exposed as `misbehave.elem` for convenience.
 
 
 <br>
@@ -94,7 +94,7 @@ Provide a `contenteditable` DOM node to the constructor as in [the Usage example
 
 **`misbehave.destroy() ⇒ undefined`**
 
-Remove all event listeners from `misbehave.elem` and delete the undo/redo history. Used to clean up if custom text entry functionality is no longer required.
+Remove all event listeners from `misbehave.elem` and delete the undo/redo history. Used to clean up if custom text entry functionality is no longer required. As with the constructor, does not remove `contenteditable` or any other HTML attributes.
 
 **`misbehave.focus() ⇒ undefined`**
 
@@ -128,7 +128,7 @@ The functionality of `autoIndent`, `autoOpen`, `autoStrip`, `overwrite`, `softTa
 
 **`pairs`** is an array containing nested arrays of `[<opening>, <closing>]` character pairs that the `autoOpen`, `autoStrip` and `overwrite` options apply to. If a "pair" consists of identical characters, such as quotation marks `"`, a single element passed is sufficient. As an example, if you would like to define `*`, and `<` and `>` as special characters, pass `[['<', '>'], ['*']]` as the `pairs` option.
 
-**`oninput`** is a callback fired whenever there the user changes edits content in `misbehave.elem`. The signature is
+**`oninput`** is a callback fired whenever there the user edits content in `misbehave.elem`. The signature is
 
 ```js
 const onInput = (textContent, { prefix, selected, suffix }) => { /* ... */ }
@@ -150,7 +150,7 @@ These fields are mainly used internally and are exposed to potentially enable ad
 | field                         | type     | description                                                                                                                                 |
 |:------------------------------|:---------|:--------------------------------------------------------------------------------------------------------------------------------------------|
 | **`misbehave.elem`**          | DOM node | A reference to the DOM element passed in the constructor                                                                                    |
-| **`misbehave.handler`**       | function | The [_behavior_](behaviors/README.md) definition used to enable the custom text entry functionality                                         |
+| **`misbehave.handler`**       | function | A reference to the [_behavior_](behaviors/README.md) definition used to handle custom text entry functionality in the DOM node              |
 | **`misbehave.inputListener`** | function | An event handler attached to the `input` DOM event of `misbehave.elem`, used to keep the instance in sync with the content and for cleanup  |
 | **`misbehave.keys`**          | module   | The [Combokeys](https://github.com/avocode/combokeys) instance used to provide key bindings for `misbehave`                                 |
 | **`misbehave.store`**         | function | Used to store a reference to the current content and selection for `misbehave.elem`                                                         |
