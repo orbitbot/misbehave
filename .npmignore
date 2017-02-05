@@ -1,0 +1,7 @@
+.travis.yml
+.npmignore
+
+rollup.config.js
+*.spec.js
+*tests.js
+docs/

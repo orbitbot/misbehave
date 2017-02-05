@@ -126,7 +126,7 @@ The second parameter to the `Misbehave` constructor is a configurations object, 
 
 The functionality of `autoIndent`, `autoOpen`, `autoStrip`, `overwrite`, `softTabs` and `replaceTab` are as described in [Comparison with behave.js](#comparison-with-behavejs). The CSS [`tab-size` property](https://developer.mozilla.org/en-US/docs/Web/CSS/tab-size) can be used to set the desired tab width if the `softTabs` option is set to `false`.
 
-**`pairs`** is an array containing nested arrays of `[<opening>, <closing>]` character pairs that the `autoOpen`, `autoStrip` and `overwrite` options apply to. If a "pair" consists of identical characters, such as quotation marks `"`, a single element passed is sufficient. As an example, if you would like to define `*`, and `<` and `>` as special characters, pass `[['<', '>'], ['*']]` as the `pairs` option.
+**`pairs`** is an array containing nested arrays of `[<opening>, <closing>]` character pairs that the `autoOpen`, `autoStrip` and `overwrite` options apply to. If a "pair" consists of identical characters, such as quotation marks `"`, an array with a single element is sufficient. As an example, if you would like to define `*`, and `<` and `>` as special characters, pass `[['<', '>'], ['*']]` as the `pairs` option.
 
 **`oninput`** is a callback fired whenever there the user edits content in `misbehave.elem`. The signature is
 
@@ -190,11 +190,11 @@ The `store` parameter is a "getter-setter" function, which is called whenever th
 ```javascript
 let fn = getterSetter
 
-fn() // returns undefined
+fn()  // returns undefined
 
 fn(4) // returns 4
 
-fn() // now returns 4
+fn()  // now returns 4
 ```
 
 `misbehave` will call the `store` function with a `{ prefix, selected, suffix }` object as used internally and described in [the behaviors README](behaviors/README.md).
