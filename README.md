@@ -20,7 +20,7 @@ Misbehave has not gone through exhaustive send-this-ship-to-the-moon production 
 <br>
 ### Features
 
-`misbehave` supports common IDE-like keypress behavior (f.e. auto indentation, automatically matching opening brackets etc.), undo and redo support, is flexibly configurable, and supports dynamic syntax highlighting together with external tools.
+`misbehave` supports common IDE-like keypress behavior (f.e. auto indentation, automatically matching opening brackets etc.), undo and redo, is flexibly configurable, and can support dynamic syntax highlighting together with external tools.
 
 ##### Comparison with behave.js
 
@@ -107,7 +107,7 @@ Convenience method to call blur on `misbehave.elem`.
 <br>
 ##### Options and defaults
 
-The second parameter to the `Misbehave` constructor is a configurations object, which is optional. The possible fields and their defaults are
+The second parameter to the `Misbehave` constructor is an optional configuration object. The possible fields and their defaults are
 
 ```
 { autoIndent = true,
