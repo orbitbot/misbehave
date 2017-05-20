@@ -12,12 +12,14 @@
 Misbehave has not gone through exhaustive send-this-ship-to-the-moon production level testing, more sort of manually by amenable code-monkeys. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
 
 <br>
+
 ### Demo
 
 - [Live demo on GH pages](https://orbitbot.github.io/misbehave/)
 - [Live demo with javascript syntax highlighting](https://orbitbot.github.io/misbehave/prismjs.html) using [Prism.js](http://prismjs.com/)
 
 <br>
+
 ### Features
 
 `misbehave` supports common IDE-like keypress behavior (f.e. auto indentation, automatically matching opening brackets etc.), undo and redo, is flexibly configurable, and can support dynamic syntax highlighting together with external tools.
@@ -39,6 +41,7 @@ Misbehave has not gone through exhaustive send-this-ship-to-the-moon production 
 - `misbehave` works on `contenteditable` HTML tags, whereas `behave.js` is implemented for textareas
 
 <br>
+
 ### Installation
 
 Right click to save or use the URLs in your script tags
@@ -56,6 +59,7 @@ The URL provided above is a uncompressed "development" URL from RawGit, you shou
 If you're using `misbehave` directly in a browser environment without a packaging toolchain, the constructor is attached `window.Misbehave`.
 
 <br>
+
 ### Usage
 
 The library exposes a `Misbehave` module or browser global, which is a constructor. The constructor expects a `contenteditable` DOM node:
@@ -78,6 +82,7 @@ let editoresque = new Misbehave(document.querySelector('#code'))
 `misbehave` will then process events on the `<code>` element only. The other attributes specified in HTML are there to remove default browser functionality that may be distracting when entering source code instead of regular text.
 
 <br>
+
 ### API
 
 For the purpose of this section, let's assign the variable `misbehave` the result of calling the constructor without custom configuration.
@@ -90,6 +95,7 @@ Provide a `contenteditable` DOM node to the constructor as in [the Usage example
 
 
 <br>
+
 ##### Methods
 
 **`misbehave.destroy() ⇒ undefined`**
@@ -105,6 +111,7 @@ Convenience method to focus `misbehave.elem`.
 Convenience method to call blur on `misbehave.elem`.
 
 <br>
+
 ##### Options and defaults
 
 The second parameter to the `Misbehave` constructor is an optional configuration object. The possible fields and their defaults are
@@ -143,6 +150,7 @@ The return value of `oninput` is ignored. The second parameter is a reference to
 **`store`** is discussed in [Store API](#store-api).
 
 <br>
+
 ##### Fields
 
 These fields are mainly used internally and are exposed to potentially enable advanced use patterns if required.
@@ -159,6 +167,7 @@ These fields are mainly used internally and are exposed to potentially enable ad
 | **`misbehave.update`**        | function | Used internally to add undo / redo actions, update the store and set the DOM as the end user edits text content                             |
 
 <br>
+
 ### Usage with Prism.js
 
 [Prism.js](http://prismjs.com/) is a syntax highlighter for webpages that can be configured to work with `misbehave`. Prism.js CSS [enforces using `<code>` elements for syntax highlighting](http://prismjs.com/#features-full), which you probably want to place inside `<pre>` elements if you are going to use `misbehave`. Configure Prism.js to highlight the code in `misbehave`'s `oninput` callback:
@@ -173,6 +182,7 @@ var misbehave = new Misbehave(code, {
 An example with the Okaida theme is [available on GH pages](https://orbitbot.github.io/misbehave/prismjs.html), the example source is under `docs/`.
 
 <br>
+
 ### Custom builds
 
 The [default build](index.js) of `misbehave` is configured as a small extension to the internal [`Editable` class](editable.js). The API for this class is essentially the same as defined above, but the `store` and `behavior` options do not have defaults and need to be provided. The intent with enabling custom builds is to potentially shave some bits by leaving out the default javascript behavior and to use some other `store` implementation such as [flyd streams](https://github.com/paldepind/flyd) to observe changing data, for example.
@@ -200,6 +210,7 @@ fn()  // now returns 4
 `misbehave` will call the `store` function with a `{ prefix, selected, suffix }` object as used internally and described in [the behaviors README](behaviors/README.md).
 
 <br>
+
 ### License
 
 `misbehave` is MIT licensed.
