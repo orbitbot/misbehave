@@ -28,6 +28,7 @@ const behavior = (newline, tablike) => {
 Where `newline` and `tablike` are the appropriate characters or strings defined by the platform and configuration, which should be used as such to implement correct indentation.
 
 <br>
+
 ### API
 
 All of the below methods return an object `{ prefix, selected, suffix }`, which represent the parameters modified with the corresponding action. `tab` indicates the tab string to use (eg. `\t` or `"  "` for soft tabs with two spaces), whereas `newLine` should be the newline character(s) to use depending on the target platform (`\n` or `\r\n`).
