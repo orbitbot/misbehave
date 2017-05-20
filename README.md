@@ -7,9 +7,9 @@
 
 <br>
 
-**Experimental-ish**
+**Experimental-ish but fully functional**
 
-Misbehave has not gone through exhaustive send-this-ship-to-the-moon production level testing, more sort of manually by amenable code-monkeys. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however.
+Misbehave has not gone through exhaustive send-this-ship-to-the-moon production level testing, more sort of manually by amenable code-monkeys. `#worksforme` - do post issues and fixes if you run into problems or unexpected behaviour, however. The current implementation is feature complete with regard to the core contenteditable functionality, no further changes outside of potential refactoring is planned. Additional behaviors may be added over time as the author or community implements and contributes these.
 
 <br>
 
